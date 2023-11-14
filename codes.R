@@ -20,7 +20,7 @@
 # install.packages("tidyverse", "psych", "devtools", "mirt", "caret", dependencies=TRUE) 
 ## INFO: Remove the hashtag before install.package() to start installing packages (only if you have not had them installed) ##
 
-# package `ggmirt` is not available in CRAN, so we have to do a remote installation by downloading the package from its Github repository.
+# Package `ggmirt` is not available in CRAN, so we have to do a remote installation by downloading the package from its Github repository.
 
 devtools::install_github("masurp/ggmirt")
 
@@ -38,30 +38,30 @@ url <- "https://openpsychometrics.org/_rawdata/RWAS.zip" # Defining the URL of t
 # If you look closely at the .zip folder, there are two files in there; one is a .csv file (this is the dataset),
 # and two, a .txt file (a codebook). Since we need them both, we will extract them and make them readable in R environment.
 
-zip_file_path <- tempfile(fileext = ".zip") # Defining the path to temporarily save the downloaded zip file
-download.file(url, zip_file_path, mode = "wb") # Downloading the zip file
-extracted_files_path <- tempdir() # Defining the path to extract the contents of the zip file
-unzip(zip_file_path, exdir = extracted_files_path) # Unzipping the .zip file
-files <- list.files(extracted_files_path, recursive = TRUE, full.names = TRUE) # List all the files in the extracted directory, including subdirectories
+zip <- tempfile(fileext = ".zip") # Defining the path to temporarily save the downloaded zip file
+download.file(url, zip, mode = "wb") # Downloading the zip file
+do <- tempdir() # Defining the path to extract the contents of the zip file
+unzip(zip, exdir = do) # Unzipping the .zip file
+files <- list.files(do, recursive = TRUE, full.names = TRUE) # List all the files in the extracted directory, including subdirectories
 
-csv_files <- grep("\\.csv$", files, value = TRUE) # Filtering for .csv files
-txt_files <- grep("\\.txt$", files, value = TRUE) # Filtering for .txt files
+csv <- grep("\\.csv$", files, value = TRUE) # Filtering for .csv files
+txt <- grep("\\.txt$", files, value = TRUE) # Filtering for .txt files
 
 
-if (length(csv_files) == 0) {
-  stop("No .csv files found in the zip archive.")
+if (length(csv) == 0) {
+  stop("no .csv found")
 } # now checking if there are any .csv files, and if that's the case, the script gives no error message
 
-if (length(txt_files) == 0) {
-  stop("No .txt files found in the zip archive.")
+if (length(txt) == 0) {
+  stop("no .txt found")
 } # do the same thing for .txt file
 
-ds <- read.csv(csv_files[1]) # Read the .csv file into a data frame
-codebook <- readLines(txt_files[1]) # Read the .txt file into R
+ds <- read.csv(csv[1]) # Read the .csv file into a data frame
+codebook <- readLines(txt[1]) # Read the .txt file into R
 
-unlink(zip_file_path)
-unlink(extracted_files_path, recursive = TRUE)
-rm(csv_files, txt_files, extracted_files_path, files, url, zip_file_path)
+unlink(zip)
+unlink(do, recursive = TRUE)
+rm(csv, txt, do, files, url, zip)
 # This three lines of script are used to clean up the temporary files and values remaining in the R environment
 
 str(ds) # Now we are checking the structure of data frame "ds", which contains our data so that we can work with it!
@@ -105,25 +105,25 @@ psych::describe(rwa)
 
 zero <- colSums(rwa == 0) / nrow(rwa) # Counting the frequency of "0" in each column.
 print(zero) # The proportion of "0" for each item.
+rm(zero) # Removing the longer needed vector
 
 # We have a significant proportion of "0" in several items (Q4, Q6, Q9, Q11, and Q18). 
 # There is no explanation what "0" means, but it is very possible that "0" is used to code a missing response.
 # It is actually still possible to run an IRT analysis with missing data, but we have to ensure that the data are missing
-# at random (MAR). However, with the proportion of missing responses even exceeding 60% for some items,
+# at random (MAR). However, with the proportion of missing responses even exceeds 60% for some items,
 # we don't think it's plausible to assume MAR. One solution for this is simply exclude all cases with missing responses.
 # Let's assume then that "0" means missing response, and then delete all cases with missing responses.
 
 rwa <- rwa %>%
   mutate_all(~na_if(., 0)) %>%  # Replace 0 with NA in all columns.
   drop_na()  # Remove rows with any NA values.
-rm(zero)
 
 # Then let's check our data again.
 psych::describe(rwa)
 
-# Apparently now all items are on the same direction, but we lost more 80% of our sample. It's also important to note that
-# no participants scored "9" in item 6 and 18. This is not a problem at all, but we have to be aware of this situation.
-# This is indeed a downside of our decision deleting all the cases with missing responses, but we since it is 
+# Now all cases with missing responses have been excluded, but we lost more 80% of our sample. It's also important to note that
+# no participants scored "9" in Q6 and Q18. This is not a problem at all, but we have to be aware of this situation.
+# Losing a large proportion of participants is indeed a downside of our decision, but we since it is 
 # unclear what "0" means (it is safer to assume that it a code for missing responses) and we still 
 # have a sizeable sample (>1000), let's proceed to the next step! 
 
@@ -155,7 +155,7 @@ fa.parallel(rwa, nfactors = 1, fm="minres", fa="fa", cor = "poly")
 # more than 8 categories (responses) in our scale. This means we can treat our data as continuous (instead of ordinal). 
 # The RWA scale has nine responses so let's do EFA and parallel analysis using a pearson correlation matrix instead.
 
-cor <- cor(rwa,method="pearson", use="pairwise.complete.obs") # First, creating cor matrix.
+cor <- cor(rwa,method="pearson") # First, creating cor matrix.
 efa <- fa(rwa, nfactors=1, fm="minres") # Now, running exploratory factor analysis.
 print(efa) # Print the results.
 
@@ -166,15 +166,17 @@ print(efa) # Print the results.
 # In general, our assumption regarding the unidimensionality of the RWA scale holds, but to paint a clearer picture, 
 # let's see the scree plot.
 
-plot(efa$values, type = "b", main = "Scree Plot", xlab = "Factor", ylab = "Eigenvalue") 
-abline(h = 1, col = "red", lty = 2)
+plot(efa$values, type = "b", main = "Scree Plot", xlab = "Factor", ylab = "Eigenvalue") # Scree plot
+abline(h = 1, col = "red", lty = 2) # Add new line to factor 1.
 
 # As we see in the plot, the Eigenvalue significantly levels off after one factor, which further substantiates our assumption.
 # However, let's run a parallel analysis, since this approach is better than running EFA.
 
-pa <- fa.parallel(rwa, fm="minres", fa="fa")
+pa <- fa.parallel(rwa, fm="minres", fa="fa") # Running a parallel analysis.
+pa$fa.values # Seeing the eigenvalues of each factor.
 
-# Again, from the plot, we can conclude that one latent factor is sufficient, further substantiates our assumption.
+# Again, from the plot and the Eigenvalues (11.68/1.18), we can conclude that one latent factor is sufficient, 
+# further substantiates our unidimensionality assumption.
 
 ## Step 5: Model estimation, parameters, and fit statistics ##  ------
 
@@ -185,47 +187,80 @@ model <- 'rwa = 1-22' # This script means that our model consists of a latent fa
 # and consists of 22 items (column 1 to column 22).
 
 # Now, we estimate our model...
-fit <- mirt(data=rwa, 1, model=model, itemtype="graded", SE=T, verbose=F) # This script means we're testing 
-# the RWA scale as a unidimensional construct 
+fit <- mirt(data=rwa, 1, model=model, itemtype="graded", SE=T, verbose=F) # This script means we're running a GRM analysis 
+# assuming that the RWA scale as a unidimensional construct 
 
 # ...and store the model parameters in a data frame.
-coefs <- coef(fit, IRTpars=T, printSE=T) 
+coefs <- coef(fit, IRTpars=T, printSE=T) # Storing model parameters in a data frame.
 
 # Let's take a look at the model parameters!
-print(coefs)
+print(coefs) # Yielding model parameters: item discriminations (a) and threshold (b).
 
-summary(fit)
-itemfit(fit) 
+# In the console, now we can see item discriminations (a), which indicates how well an item differentiates
+# participant with different levels of authoritarian personality. To interpret this, we could use a guideline from 
+# Baker (2017). RWA items, in general, have a moderate to very high ability to differentiate participants with different theta levels.
+# We can see that most items have 8 item threshold each (b1-b8), and this is because we have nine response options.
+# However, two items (Q6 and Q18) only have 7 item thresholds, and this is because no participant in our sample opted for/scored 
+# "9" for these two items.
 
-M2(fit, type="C2") 
+summary(fit) # Yielding factor loadings and communality (h2) from mirt model.
+
+# Before estimating a graded response model, mirt ran an EFA, and now as we can see in the console,
+# we are looking at the EFA results. The results are slightly different from our previous EFA analysis,
+# because mirt EFA using a quasi polychoric correlation matrix, while the one we ran earlier used a pearson 
+# correlation matrix. However, most importantly, we see that all items are significantly loaded to one factor, 
+# and the factor now substantially accounts for 61.1% of the variance in the data, which strengthens our assumption
+# that the RWA scale is unidimensional.
+
+# Now, let's look at the (model and item) fit statistics
+M2(fit, type="C2") # Running model fit analysis.
+# Apparently, our model, overall, does not fit well with the data. Could it be a problem of model misspecification?
+
+itemfit(fit) # Yielding item fit statistics.
+# Looking at RMSEA and p values of the scaled X2 statistics, we can see here that Q3, Q7, and Q13 are misfitting.
+
+# Taking account the model and item fit statistics, it is vary likely that we have problems with our model.
+# It could be a problem of model misspecification, or something else. We can identify potential problems by
+# looking at local dependency statistics (Step 6) and the plots (Step 7).
 
 ## Step 6: Testing local independence assumption (again) using different strategies (local dependency statistics) ##  ------
 
-q3 <- residuals(fit, type = "Q3")
-findCorrelation(q3, cutoff = 0.2, verbose = T) # Q4, Q5, Q6, Q7, Q11, Q13, Q14, Q15, Q18, Q19, Q21, Q22 are problematic.
+# While we have evidence that the RWA scale is unidimensional, our model does not fit well with the data.
+# Therefore, let's examine the possibility of model misspecification by looking at model residuals. 
+# In this tutorial, we will introduce two ways to examine residuals. First, we will inspect a local dependence 
+# matrix derived from the X2 statistics (Chen & Thissen, 1997), and second, we will look at Yen's Q3
+# statistics. 
 
-ld <- residuals(fit, type = "LD")
-upper_diag_indices <- which(upper.tri(ld), arr.ind = T)
-large_values_indices <- upper_diag_indices[ld[upper_diag_indices] > 0.2 | ld[upper_diag_indices] < -0.2, ]
+ld <- residuals(fit, type = "LD") # Running local dependency statistics
+up <- which(upper.tri(ld), arr.ind = T) # Extracting values only on the upper side of the diagonal.
+lar <- up[ld[up] > 0.2 | ld[up] < -0.2, ] # Defining unusually large residuals (>0.2).
 
-for (i in 1:nrow(large_values_indices)) {
-  row <- large_values_indices[i, 1]
-  col <- large_values_indices[i, 2]
+for (i in 1:nrow(lar)) {
+  row <- lar[i, 1]
+  col <- lar[i, 2]
   value <- ld[row, col]
-  cat(sprintf("A large correlation is found at [%d, %d]: %f\n", row, col, value))
-} # Q3, Q7, Q9, Q10, Q11, Q12, Q13, Q14, Q15, Q17, Q19, Q21, Q22 are seemingly problematic here.
+  cat(sprintf("A large residual correlation is found between item %d and item %d: %f\n", row, col, value))
+} # Now we detect the problematic pairs.
 
+# As we can see in the console, there are quite a lot of problematic items in the RWA scale. 
+# Q3, Q7, Q9, Q10, Q11, Q12, Q13, Q14, Q15, Q17, Q19, Q21, Q22 are strongly intercorrelated even though we have
+# accounted for the latent trait being measured.
 
+# Let's see how Yen's Q3 statistics look like.
+q3 <- residuals(fit, type = "Q3") # Running Yen's Q3 statistics
+findCorrelation(q3, cutoff = 0.2, verbose = T) # Detecting problematic correlation pairs.
+# As we see here in the console that items Q4, Q5, Q6, Q7, Q11, Q13, Q14, Q15, Q18, Q19, Q21, Q22 are problematic.
 
 ## Step 7: Plots (category probability function, item information function, and test information function) ##   ------
 
-tracePlot(fit, title = "Category Probability Function of RWA Scale")
+# From the previous step, we found some problems with model misspecification. 
+# Let's take a look at the curves to 
+
+tracePlot(fit, facet=T, title = "Item Characteristics Curves of RWA Scale") + labs(color="Response Options")
 
 itemInfoPlot(fit, facet=T, title = "Item Information Curves of the RWA Scale")
 
 testInfoPlot(fit, title="Test Information Curve of the RWA Scale")
-
-scaleCharPlot(fit, title="Scale Characteristic Curve of the RWA Scale")
 
 ## Step 8: Extracting factor scores (theta) ##   ------
 
@@ -239,7 +274,6 @@ empirical_rxx(theta_se)
 
 alpha(rwa)
 omega(rwa)
-
 
 # Session Info ------
 sessionInfo()

@@ -1,0 +1,73 @@
+---
+title: "Getting Started with the Graded Response Model (GRM): A gentle introduction and tutorial in R"
+shorttitle: "Graded Response Model Tutorial"
+author:
+  - name: Rizqy Amelia Zein
+    corresponding: true
+    orcid: "0000-0001-7840-0299"
+    email: "Amelia.Zein@psy.lmu.de"
+    affiliations:
+      - name: "Ludwig-Maximilians-Universität"
+        department: "Psychology"
+        address: "Leopoldstraße 13"
+        city: "Munich"
+        country: "Germany"
+        postal-code: "80802"
+      - name: "Universitas Airlangga"
+        department: "Psychology"
+        address: "Jalan Airlangga 4-6"
+        city: "Surabaya"
+        region: "Jawa Timur"
+        country: "Indonesia"
+        postal-code: "60286"
+  - name: "Hanif Akhtar"
+    affiliations:
+      - name: "ELTE Eötvös Loránd University"
+        department: "Psychology"
+        country: "Hungary"
+      - name: "Universitas Muhammadiyah Malang"
+        department: "Psychology"
+        city: "Malang"
+        region: "Jawa Timur"
+        country: "Indonesia"
+abstract: "This tutorial paper introduces the Graded Response Model (GRM), a tool for testing measurement precision under the Item Response Theory (IRT) paradigm. Addressing common problems of measurement imprecision and lack of construct validity, the tutorial guides researchers through a one-dimensional GRM analysis in the R environment, using psych, mirt, and ggmirt packages. GRM is specifically designed to examine the psychometric properties of psychological scales with polytomous items. The tutorial illustrates the procedure using data from the Open Psychometrics Database on the Right-Wing Authoritarianism (RWA) scale, outlining the theoretical underpinnings of GRM, and steps for data preparation, model fitting, interpretation of results, and dealing with common issues and anomalies that may typically arise in the process."
+keywords:
+  - graded response model
+  - item response theory
+  - mirt
+  - ggmirt
+  - psych
+  - R
+author-note:
+  disclosures:
+    conflict-of-interest: "We declare we have no competing interests."
+    financial-support: "The first author receives a PhD scholarship from the German Academic Exchange Service (Deutscher Akademischer Austauschdienst, DAAD)."
+lang: en
+bibliography: references.bib
+format:
+  apaquarto-docx: default
+editor: visual
+---
+
+{{< include _extensions/wjschne/apaquarto/_apa_title.qmd >}}
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+1 + 1
+```
+
+You can add options to executable code like this
+
+```{r}
+#| echo: false
+2 * 2
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
