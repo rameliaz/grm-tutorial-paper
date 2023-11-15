@@ -2,7 +2,6 @@
 # by Rizqy Amelia Zein and Hanif Akhtar
 # LMU Munich, Universitas Airlangga (UNAIR), ELTE Eötvös Loránd University, and Universitas Muhammadiyah Malang (UMM)
 
-
 # Welcome to the tutorial!  ------
 # This tutorial aims to familiarize applied psychological researchers to item response theory (IRT) modeling, 
 # or more specifically, a graded response model (GRM). GRM is a part of IRT family, specifically designed for
@@ -187,8 +186,7 @@ model <- 'rwa = 1-22' # This script means that our model consists of a latent fa
 # and consists of 22 items (column 1 to column 22).
 
 # Now, we estimate our model...
-fit <- mirt(data=rwa, 1, model=model, itemtype="graded", SE=T, verbose=F) # This script means we're running a GRM analysis 
-# assuming that the RWA scale as a unidimensional construct 
+fit <- mirt(data=rwa, 1, model=model, itemtype="graded", SE=T, verbose=F) # This script means we're running a GRM analysis by assuming that the RWA scale as a unidimensional construct 
 
 # ...and store the model parameters in a data frame.
 coefs <- coef(fit, IRTpars=T, printSE=T) # Storing model parameters in a data frame.
@@ -223,7 +221,7 @@ itemfit(fit) # Yielding item fit statistics.
 # It could be a problem of model misspecification, or something else. We can identify potential problems by
 # looking at local dependency statistics (Step 6) and the plots (Step 7).
 
-## Step 6: Testing local independence assumption (again) using different strategies (local dependency statistics) ##  ------
+## Step 6: Probing model misspecification by examining residuals ##  ------
 
 # While we have evidence that the RWA scale is unidimensional, our model does not fit well with the data.
 # Therefore, let's examine the possibility of model misspecification by looking at model residuals. 
@@ -251,29 +249,56 @@ q3 <- residuals(fit, type = "Q3") # Running Yen's Q3 statistics
 findCorrelation(q3, cutoff = 0.2, verbose = T) # Detecting problematic correlation pairs.
 # As we see here in the console that items Q4, Q5, Q6, Q7, Q11, Q13, Q14, Q15, Q18, Q19, Q21, Q22 are problematic.
 
-## Step 7: Plots (category probability function, item information function, and test information function) ##   ------
+## Step 7: Plots (item characteristics curve, item information curve, and test information curve) ##   ------
 
 # From the previous step, we found some problems with model misspecification. 
-# Let's take a look at the curves to 
+# Let's take a look at the curves to closely examine the items.
 
+# Plotting Item Characteristics Curve (ICC) .
 tracePlot(fit, facet=T, title = "Item Characteristics Curves of RWA Scale") + labs(color="Response Options")
 
+# Plotting Item Information Curve (IIC).
 itemInfoPlot(fit, facet=T, title = "Item Information Curves of the RWA Scale")
+# Some items (Q4, Q9, Q11, Q13, Q15, Q21) seem to have atypical patterns. The curves of these items
+# have a slight dip on the right side and then increase a bit after that. It's very likely that these
+# curves have two peaks. Let's increase our theta range to look closely.
 
+itemInfoPlot(fit, facet=T, theta_range = c(-6,6), title = "Item Information Curves of the RWA Scale")# 
+# As we see here, the curves of those items have two peaks. This is an interesting situation which is caused by
+# a number of possibilities.
+
+# Plotting Test Information Curve.
 testInfoPlot(fit, title="Test Information Curve of the RWA Scale")
+# Apparently, the RWA scale is informative to measure participants with theta levels between -3SD to +2SD.
 
-## Step 8: Extracting factor scores (theta) ##   ------
+## Step 8: Estimating reliability ##   ------
 
-theta_se <- fscores(fit, full.scores.SE = T)
+# At last, we want to examine the reliability of the RWA scale. In IRT, there are two ways to estimate reliability,
+# which are: marginal and empirical reliability.
 
-## Step 9: Estimating reliability ##   ------
+# To calculate empirical reliability, we have to compute participants' theta (factor scores) estimated by the model.
+# To do this, we only need to run a simple script below:
 
-marginal_rxx(fit)
+theta_se <- fscores(fit, full.scores.SE = T) # Extracting the estimated theta score of each participant.
+
+# And then, we can use the estimated theta to compute empirical reliability.
+empirical_rxx(theta_se) # Then use the estimated theta to calculate empirical reliability.
+# Reliability seems to be pretty good.
+
+# Now we need to calculate marginal reliability.
+marginal_rxx(fit) # Calculating marginal reliability.
+# Marginal reliability is almost similar to empirical reliability.
+
+# ...and then plot the marginal reliability across the latent trait spectrum.
 conRelPlot(fit, title="Reliability of the RWA Scale Given to the θ Level")
-empirical_rxx(theta_se)
+# The RWA scale seems to be optimal (having sufficient reliability - >0.8) for measuring participants with theta levels between
+# -3SD and +4SD. However, there is an unusual dip on the right side of the curve.
 
-alpha(rwa)
-omega(rwa)
+# Let's compare IRT-based reliability and unweighted sum score based reliability.
+
+omega(rwa) # This script computes several reliability coefficients
+# As we see here, the RWA scale is internally consistent, but again, this does not negate the fact that there are
+# underlying problems with the scale, as we have seen in our previous analysis.
 
 # Session Info ------
 sessionInfo()
