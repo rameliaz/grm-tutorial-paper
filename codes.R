@@ -11,7 +11,7 @@
 # the right-wing authoritarianism (RWA) scale (Altemeyer). 
 
 
-## Step 1: Install and activate the packages ##  ------
+## Step 1a: Preparation - Install and activate the packages ##  ------
 
 # First of all, we should install the packages we need for the analysis. If you already have these packages  
 # already installed in your device, you can safely skip this step.
@@ -27,7 +27,7 @@ devtools::install_github("masurp/ggmirt")
 
 library(tidyverse); library(psych); library(mirt); library(ggmirt); library(caret)
 
-## Step 2: Downloading, storing, and preparing the data for analysis ##   ------
+## Step 1b: Preparation - Downloading, storing, and preparing the data for analysis ##   ------
 
 # Before running our analysis, of course we should download our dataset first. Here, we have written codes to automatically
 # download the file from the Open Psychometric database. You can always adjust these codes according to your needs.
@@ -78,7 +78,7 @@ rwa <- subset(ds, select = Q1:Q22) # now we subset our data because we are only 
 # Now let's check the structure of our new data frame containing only RWA items.
 str(rwa)
 
-## Step 3: Inspecting key descriptive statistics ##   ------
+## Step 2: Inspecting key descriptive statistics ##   ------
 
 # This part is fairly straightforward. Before performing analysis, it is very important to explore
 # key descriptive statistics of the data. We are using a neat function in `psych` package: (`describe()`)
@@ -126,7 +126,7 @@ psych::describe(rwa)
 # unclear what "0" means (it is safer to assume that it a code for missing responses) and we still 
 # have a sizeable sample (>1000), let's proceed to the next step! 
 
-## Step 4: Examining dimensionality ##  ------
+## Step 3: Examining dimensionality ##  ------
 
 # While now it is computationally possible to run a multidimensional IRT analysis, in general, an IRT model assumes
 # that the items are locally independent. 
@@ -177,7 +177,7 @@ pa$fa.values # Seeing the eigenvalues of each factor.
 # Again, from the plot and the Eigenvalues (11.68/1.18), we can conclude that one latent factor is sufficient, 
 # further substantiates our unidimensionality assumption.
 
-## Step 5: Model estimation, parameters, and fit statistics ##  ------
+## Step 4: Model estimation, parameters, and fit statistics ##  ------
 
 # Now we have evidence that the scale is unidimensional, now it is the time to estimate our model.
 # As the first step, let's define our model:
@@ -221,7 +221,7 @@ itemfit(fit) # Yielding item fit statistics.
 # It could be a problem of model misspecification, or something else. We can identify potential problems by
 # looking at local dependency statistics (Step 6) and the plots (Step 7).
 
-## Step 6: Probing model misspecification by examining residuals ##  ------
+## Step 5: Probing model misspecification by examining residuals ##  ------
 
 # While we have evidence that the RWA scale is unidimensional, our model does not fit well with the data.
 # Therefore, let's examine the possibility of model misspecification by looking at model residuals. 
@@ -249,7 +249,7 @@ q3 <- residuals(fit, type = "Q3") # Running Yen's Q3 statistics
 findCorrelation(q3, cutoff = 0.2, verbose = T) # Detecting problematic correlation pairs.
 # As we see here in the console that items Q4, Q5, Q6, Q7, Q11, Q13, Q14, Q15, Q18, Q19, Q21, Q22 are problematic.
 
-## Step 7: Plots (item characteristics curve, item information curve, and test information curve) ##   ------
+## Step 6: Plots (item characteristics curve, item information curve, and test information curve) ##   ------
 
 # From the previous step, we found some problems with model misspecification. 
 # Let's take a look at the curves to closely examine the items.
@@ -271,7 +271,7 @@ itemInfoPlot(fit, facet=T, theta_range = c(-6,6), title = "Item Information Curv
 testInfoPlot(fit, title="Test Information Curve of the RWA Scale")
 # Apparently, the RWA scale is informative to measure participants with theta levels between -3SD to +2SD.
 
-## Step 8: Estimating reliability ##   ------
+## Step 7: Estimating reliability ##   ------
 
 # At last, we want to examine the reliability of the RWA scale. In IRT, there are two ways to estimate reliability,
 # which are: marginal and empirical reliability.

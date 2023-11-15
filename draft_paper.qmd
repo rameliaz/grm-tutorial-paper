@@ -1,6 +1,6 @@
 ---
 title: "Getting Started with the Graded Response Model (GRM): A gentle introduction and tutorial in R"
-shorttitle: "Graded Response Model Tutorial"
+shorttitle: "A Graded Response Model Tutorial"
 author:
   - name: Rizqy Amelia Zein
     corresponding: true
@@ -56,9 +56,9 @@ editor: visual
 # devtools::install_github("masurp/ggmirt")
 # Now, we activate the package:
 library(tidyverse); library(psych); library(mirt); library(ggmirt); library(caret)
+ds <- read.csv("data/data.csv")
 
 ```
-
 
 
 
