@@ -51,15 +51,14 @@ editor: visual
 
 ```{r, echo=F, include=F}
 #| label: setup
-#| install.packages("tidyverse", "psych", "devtools", "mirt", "caret", dependencies=TRUE) 
-#| INFO: Remove the hashtag before install.package() to start installing packages (only if you have not had them installed) ##
-
-#| devtools::install_github("masurp/ggmirt")
-
-#| Now, we activate the package:
+# install.packages("tidyverse", "psych", "devtools", "mirt", "caret", dependencies=TRUE) 
+# INFO: Remove the hashtag before install.package() to start installing packages (only if you have not had them installed)
+# devtools::install_github("masurp/ggmirt")
+# Now, we activate the package:
 library(tidyverse); library(psych); library(mirt); library(ggmirt); library(caret)
 
 ```
+
 
 
 
