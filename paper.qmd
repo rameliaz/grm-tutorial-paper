@@ -49,26 +49,21 @@ editor: visual
 
 {{< include _extensions/wjschne/apaquarto/_apa_title.qmd >}}
 
-## Quarto
+```{r, echo=F, include=F}
+#| label: setup
+#| install.packages("tidyverse", "psych", "devtools", "mirt", "caret", dependencies=TRUE) 
+#| INFO: Remove the hashtag before install.package() to start installing packages (only if you have not had them installed) ##
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+#| devtools::install_github("masurp/ggmirt")
 
-## Running Code
+#| Now, we activate the package:
+library(tidyverse); library(psych); library(mirt); library(ggmirt); library(caret)
 
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
-
-```{r}
-1 + 1
 ```
 
-You can add options to executable code like this
 
-```{r}
-#| echo: false
-2 * 2
-```
 
-The `echo: false` option disables the printing of code (only output is displayed).
+{{< pagebreak >}}
 
 # References
 
