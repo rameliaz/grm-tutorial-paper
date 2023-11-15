@@ -271,7 +271,7 @@ itemInfoPlot(fit, facet=T, theta_range = c(-6,6), title = "Item Information Curv
 testInfoPlot(fit, title="Test Information Curve of the RWA Scale")
 # Apparently, the RWA scale is informative to measure participants with theta levels between -3SD to +2SD.
 
-## Step 7: Estimating reliability ##   ------
+## Step 7: Computing reliability ##   ------
 
 # At last, we want to examine the reliability of the RWA scale. In IRT, there are two ways to estimate reliability,
 # which are: marginal and empirical reliability.

@@ -60,6 +60,25 @@ ds <- read.csv("data/data.csv")
 
 ```
 
+Measurement lays an important foundation of psychological science. 
+
+# A Brief Overview of Item Response Theory
+
+# Graded Response Model
+
+# Assumptions and Key Concepts
+
+# An Illustrative Example of Graded Response Model: The Right Wing Authoritarianism (RWA) Scale
+## A Brief Overview of the Altemeyer's RWA Scale
+## Step 1: Preparation
+## Step 2: Inspecting Key Descriptive Statistics
+## Step 3: Examining Dimensionality
+## Step 4: Model Estimation, Parameters, and Fit Statistics
+## Step 5: Model Residuals
+## Step 6: IRT Plots
+## Step 7: Computing Reliability
+
+# Conclusions
 
 
 {{< pagebreak >}}
