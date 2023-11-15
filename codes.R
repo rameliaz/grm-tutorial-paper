@@ -10,7 +10,6 @@
 # To this end, we will show you how to run a GRM, using data from the Open Psychometric Database, specifically 
 # the right-wing authoritarianism (RWA) scale (Altemeyer). 
 
-
 ## Step 1a: Preparation - Install and activate the packages ##  ------
 
 # First of all, we should install the packages we need for the analysis. If you already have these packages  
@@ -55,8 +54,8 @@ if (length(txt) == 0) {
   stop("no .txt found")
 } # do the same thing for .txt file
 
-ds <- read.csv(csv[1]) # Read the .csv file into a data frame
-codebook <- readLines(txt[1]) # Read the .txt file into R
+ds <- read.csv(csv[1]) # Importing the .csv file.
+codebook <- readLines(txt[1]) # Importing the .txt file.
 
 unlink(zip)
 unlink(do, recursive = TRUE)
@@ -102,20 +101,20 @@ psych::describe(rwa)
 
 # Let's count how many "0" we have in our data.
 
-zero <- colSums(rwa == 0) / nrow(rwa) # Counting the frequency of "0" in each column.
+zero <- colSums(rwa == 0) / nrow(rwa) # Computing the frequency of "0" in each column.
 print(zero) # The proportion of "0" for each item.
-rm(zero) # Removing the longer needed vector
+rm(zero) # Removing the unused vector
 
 # We have a significant proportion of "0" in several items (Q4, Q6, Q9, Q11, and Q18). 
-# There is no explanation what "0" means, but it is very possible that "0" is used to code a missing response.
+# There is no explanation what "0" means in the codebook, but it is very possible that "0" is used to code a missing response.
 # It is actually still possible to run an IRT analysis with missing data, but we have to ensure that the data are missing
 # at random (MAR). However, with the proportion of missing responses even exceeds 60% for some items,
 # we don't think it's plausible to assume MAR. One solution for this is simply exclude all cases with missing responses.
 # Let's assume then that "0" means missing response, and then delete all cases with missing responses.
 
 rwa <- rwa %>%
-  mutate_all(~na_if(., 0)) %>%  # Replace 0 with NA in all columns.
-  drop_na()  # Remove rows with any NA values.
+  mutate_all(~na_if(., 0)) %>%  # Replacing 0 with NA in all columns.
+  drop_na()  # Removing cases with any NA values.
 
 # Then let's check our data again.
 psych::describe(rwa)
@@ -155,7 +154,9 @@ fa.parallel(rwa, nfactors = 1, fm="minres", fa="fa", cor = "poly")
 # The RWA scale has nine responses so let's do EFA and parallel analysis using a pearson correlation matrix instead.
 
 cor <- cor(rwa,method="pearson") # First, creating cor matrix.
-efa <- fa(rwa, nfactors=1, fm="minres") # Now, running exploratory factor analysis.
+efa <- fa(rwa, nfactors=1, fm="minres") # Now, running exploratory factor analysis. 
+# Here, we use minimum residuals (minres) algorithm extract/identify latent factors because it is considered suitable for
+# dealing with non-normally distributed data.
 print(efa) # Print the results.
 
 # Let's look at the output. MR1 reflects factor loadings of each item. As we see, all items are strongly loaded to 
@@ -266,7 +267,7 @@ itemInfoPlot(fit, facet=T, title = "Item Information Curves of the RWA Scale")
 
 itemInfoPlot(fit, facet=T, theta_range = c(-6,6), title = "Item Information Curves of the RWA Scale")# 
 # As we see here, the curves of those items have two peaks. This is an interesting situation which is caused by
-# a number of possibilities.
+# a number of possibilities (model misspecification, poorly functioning items, violations of monotonicity, etc.).
 
 # Plotting Test Information Curve.
 testInfoPlot(fit, title="Test Information Curve of the RWA Scale")
