@@ -129,7 +129,7 @@ psych::describe(rwa)
 ## Step 3: Examining dimensionality ##  ------
 
 # While now it is computationally possible to run a multidimensional IRT analysis, in general, an IRT model assumes
-# that the items are locally independent. 
+# that the scale is unidimensional. 
 # Bob Altemeyer (1996) argues in his book that while the RWA scale consists of three sub-dimensions,
 # which are submissiveness, aggression, and conventionalism, the RWA scale is essentially unidimensional because these 
 # three sub-dimensions are strongly intercorrelated.
@@ -223,11 +223,12 @@ itemfit(fit) # Yielding item fit statistics.
 
 ## Step 5: Probing model misspecification by examining residuals ##  ------
 
-# While we have evidence that the RWA scale is unidimensional, our model does not fit well with the data.
-# Therefore, let's examine the possibility of model misspecification by looking at model residuals. 
+# While we have evidence that the RWA scale is unidimensional, our model does not fit well with the data. Therefore,
+# it is reasonable to suspect that our model is locally dependent, thus violating IRT assumption.
+
+# We will then further examine the possibility of model misspecification by looking at model residuals. 
 # In this tutorial, we will introduce two ways to examine residuals. First, we will inspect a local dependence 
-# matrix derived from the X2 statistics (Chen & Thissen, 1997), and second, we will look at Yen's Q3
-# statistics. 
+# matrix derived from the X2 statistics (Chen & Thissen, 1997), and second, we will look at Yen's Q3 statistics. 
 
 ld <- residuals(fit, type = "LD") # Running local dependency statistics
 up <- which(upper.tri(ld), arr.ind = T) # Extracting values only on the upper side of the diagonal.
