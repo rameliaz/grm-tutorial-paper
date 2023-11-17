@@ -191,7 +191,7 @@ model <- 'rwa = 1-22' # This script means that our model consists of a latent fa
 fit <- mirt(data=rwa, 1, model=model, itemtype="graded", SE=T, verbose=F) # This script means we're running a GRM analysis by assuming that the RWA scale as a unidimensional construct 
 
 # ...and store the model parameters in a data frame.
-coefs <- coef(fit, IRTpars=T, printSE=T, simplify=T) # Storing model parameters in a data frame.
+coefs <- coef(fit, IRTpars=T, simplify=T) # Storing model parameters in a data frame.
 
 # Let's take a look at the model parameters!
 print(coefs) # Yielding model parameters: item discriminations (a) and threshold (b).
