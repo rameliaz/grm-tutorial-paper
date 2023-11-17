@@ -143,34 +143,35 @@ irt.fa(rwa, nfactors = 1, fm = "minres")
 
 # Alternatively, we can run a parallel analysis also with a polychoric correlation matrix. This approach
 # is, in general, better than EFA because a parallel analysis compares Eigenvalues (a scalar which measures the amount
-# of variance that is accounted for by each latent factor) from a set of simulated data.
+# of variance that is accounted for by each latent factor) from a set of simulated data with Eigenvalues of our data.
 # Again, to perform this, we need to run a simple command:
 
 fa.parallel(rwa, nfactors = 1, fm="minres", fa="fa", cor = "poly")
 
-# However, as we see in the console, there is an error message which tells us that R stopped the analysis.
+# However, as we see in the console, there is an error message telling us that R stopped the analysis.
 # This is because performing parallel analysis or EFA using a polychoric correlation matrix is not needed when we have
 # more than 8 categories (responses) in our scale. This means we can treat our data as continuous (instead of ordinal). 
 # The RWA scale has nine responses so let's do EFA and parallel analysis using a pearson correlation matrix instead.
 
-cor <- cor(rwa,method="pearson") # First, creating cor matrix.
+cor <- cor(rwa,method="pearson") # First, creating a (pearson) correlation matrix.
 efa <- fa(rwa, nfactors=1, fm="minres") # Now, running exploratory factor analysis. 
-# Here, we use minimum residuals (minres) algorithm extract/identify latent factors because it is considered suitable for
+# Here, we use minimum residuals (minres) algorithm to extract/identify latent factors because it is considered suitable for
 # dealing with non-normally distributed data.
 print(efa) # Print the results.
 
-# Let's look at the output. MR1 reflects factor loadings of each item. As we see, all items are strongly loaded to 
+# Let's look at the output. 
+# MR1 reflects factor loadings of each item. As we see, all items are strongly loaded to 
 # the single factor. The rule of thumb is 0.3, and we can see here all the loadings are more than 0.3.
-# We also see that the proportion of total variance that is explained by the factor (see "Proportion Var") shows 0.55,
-# this means that the factor accounts for a significant portion (55%) of the variance of the data.
+# We also see that the proportion of total variance that is explained by the factor (see "Proportion Var") shows 0.53,
+# this means that the factor accounts for a significant portion (53%) of the variance of the data.
 # In general, our assumption regarding the unidimensionality of the RWA scale holds, but to paint a clearer picture, 
-# let's see the scree plot.
 
+# Let's see the scree plot.
 plot(efa$values, type = "b", main = "Scree Plot", xlab = "Factor", ylab = "Eigenvalue") # Scree plot
 abline(h = 1, col = "red", lty = 2) # Add new line to factor 1.
 
 # As we see in the plot, the Eigenvalue significantly levels off after one factor, which further substantiates our assumption.
-# However, let's run a parallel analysis, since this approach is better than running EFA.
+# However, let's run a parallel analysis, since this approach is better than running an EFA.
 
 pa <- fa.parallel(rwa, fm="minres", fa="fa") # Running a parallel analysis.
 pa$fa.values # Seeing the eigenvalues of each factor.
@@ -180,7 +181,7 @@ pa$fa.values # Seeing the eigenvalues of each factor.
 
 ## Step 4: Model estimation, parameters, and fit statistics ##  ------
 
-# Now we have evidence that the scale is unidimensional, now it is the time to estimate our model.
+# We have evidence that the scale is unidimensional, now it is the time to estimate our model.
 # As the first step, let's define our model:
 
 model <- 'rwa = 1-22' # This script means that our model consists of a latent factor namely "rwa"
@@ -190,7 +191,7 @@ model <- 'rwa = 1-22' # This script means that our model consists of a latent fa
 fit <- mirt(data=rwa, 1, model=model, itemtype="graded", SE=T, verbose=F) # This script means we're running a GRM analysis by assuming that the RWA scale as a unidimensional construct 
 
 # ...and store the model parameters in a data frame.
-coefs <- coef(fit, IRTpars=T, printSE=T) # Storing model parameters in a data frame.
+coefs <- coef(fit, IRTpars=T, printSE=T, simplify=T) # Storing model parameters in a data frame.
 
 # Let's take a look at the model parameters!
 print(coefs) # Yielding model parameters: item discriminations (a) and threshold (b).
@@ -218,7 +219,7 @@ M2(fit, type="C2") # Running model fit analysis.
 itemfit(fit) # Yielding item fit statistics.
 # Looking at RMSEA and p values of the scaled X2 statistics, we can see here that Q3, Q7, and Q13 are misfitting.
 
-# Taking account the model and item fit statistics, it is vary likely that we have problems with our model.
+# Taking account the model and item fit statistics, it is very likely that we have problems with our model.
 # It could be a problem of model misspecification, or something else. We can identify potential problems by
 # looking at local dependency statistics (Step 6) and the plots (Step 7).
 
