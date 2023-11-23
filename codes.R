@@ -83,6 +83,26 @@ str(rwa)
 # key descriptive statistics of the data. We are using a neat function in `psych` package: (`describe()`)
 
 psych::describe(rwa)
+# Why there are "0" values in all columns (see column "min")?
+# The items are not supposed to have "0" value because the responses are ranging from 1-9.
+
+# Let's count how many "0" we have in our data.
+
+zero <- colSums(rwa == 0) / nrow(rwa) * 100 # Computing the frequency of "0" in each column.
+print(zero) # The proportion of "0" for each item.
+rm(zero) # Removing the unused vector
+
+# We have a few cases with "0" in all items. 
+# There is no explanation what "0" means in the codebook, but it is very possible that "0" is used to code a missing response.
+# It is actually still possible to run an IRT analysis with missing data, but we have to ensure that the data are missing
+# at random (MAR). One solution for this is simply exclude all cases with missing responses.
+# Let's assume then that "0" means missing response, and then delete all cases with missing responses.
+
+rwa <- rwa %>%
+  mutate_all(~na_if(., 0)) %>%  # Replacing 0 with NA in all columns.
+  drop_na()  # Removing cases with any NA values.
+
+psych::describe(rwa)
 # As we see here in the console, mean score of the items differ - some items have small mean scores (~2-3), while the
 # others are quite large (~6-7). The reason for this is that the RWA scale has unfavorable items 
 # so to simplify the interpretation, we should reverse their scores.
@@ -91,39 +111,18 @@ psych::describe(rwa)
 
 unfav <- c("Q4","Q6","Q8","Q9","Q11","Q13","Q15","Q18","Q20","Q21") # Now we create a vector defining which items will be coded reversely.
 rwa <- rwa %>% 
-  mutate(across(all_of(unfav), ~ 9 - .))# We simply subtract the scores from 9 (the maximum) to reverse code the unfavorable items.
+  mutate(across(all_of(unfav), ~ 10 - .))# We simply subtract the scores from 9 (the maximum) + 1 
+# to reverse code the unfavorable items.
 rm(unfav) # We don't need the vector, so we remove it now to keep our workspace clean.
-
-# Let's see if the items are coded in the same direction now.
-psych::describe(rwa)
-# Yes, the items are coded on the same direction, but why there are "0" values in all columns (see column "min")?
-# The items are not supposed to have "0" value because the responses are ranging from 1-9.
-
-# Let's count how many "0" we have in our data.
-
-zero <- colSums(rwa == 0) / nrow(rwa) # Computing the frequency of "0" in each column.
-print(zero) # The proportion of "0" for each item.
-rm(zero) # Removing the unused vector
-
-# We have a significant proportion of "0" in several items (Q4, Q6, Q9, Q11, and Q18). 
-# There is no explanation what "0" means in the codebook, but it is very possible that "0" is used to code a missing response.
-# It is actually still possible to run an IRT analysis with missing data, but we have to ensure that the data are missing
-# at random (MAR). However, with the proportion of missing responses even exceeds 60% for some items,
-# we don't think it's plausible to assume MAR. One solution for this is simply exclude all cases with missing responses.
-# Let's assume then that "0" means missing response, and then delete all cases with missing responses.
-
-rwa <- rwa %>%
-  mutate_all(~na_if(., 0)) %>%  # Replacing 0 with NA in all columns.
-  drop_na()  # Removing cases with any NA values.
 
 # Then let's check our data again.
 psych::describe(rwa)
 
-# Now all cases with missing responses have been excluded, but we lost more 80% of our sample. It's also important to note that
-# no participants scored "9" in Q6 and Q18. This is not a problem at all, but we have to be aware of this situation.
-# Losing a large proportion of participants is indeed a downside of our decision, but we since it is 
+# Now all cases with missing responses have been excluded, and unfavorable items have been reverse scored
+# but we lost a few proportion of our sample. 
+# Losing some cases is indeed a downside of our decision, but we since it is 
 # unclear what "0" means (it is safer to assume that it a code for missing responses) and we still 
-# have a sizeable sample (>1000), let's proceed to the next step! 
+# have a sizeable sample (>9000), let's proceed to the next step! 
 
 ## Step 3: Examining dimensionality ##  ------
 
@@ -162,8 +161,8 @@ print(efa) # Print the results.
 # Let's look at the output. 
 # MR1 reflects factor loadings of each item. As we see, all items are strongly loaded to 
 # the single factor. The rule of thumb is 0.3, and we can see here all the loadings are more than 0.3.
-# We also see that the proportion of total variance that is explained by the factor (see "Proportion Var") shows 0.53,
-# this means that the factor accounts for a significant portion (53%) of the variance of the data.
+# We also see that the proportion of total variance that is explained by the factor (see "Proportion Var") shows 0.56,
+# this means that the factor accounts for a significant portion (56%) of the variance of the data.
 # In general, our assumption regarding the unidimensionality of the RWA scale holds, but to paint a clearer picture, 
 
 # Let's see the scree plot.
@@ -176,7 +175,7 @@ abline(h = 1, col = "red", lty = 2) # Add new line to factor 1.
 pa <- fa.parallel(rwa, fm="minres", fa="fa") # Running a parallel analysis.
 pa$fa.values # Seeing the eigenvalues of each factor.
 
-# Again, from the plot and the Eigenvalues (11.68/1.18), we can conclude that one latent factor is sufficient, 
+# Again, from the plot and the Eigenvalues (12.22/0.84), we can conclude that one latent factor is sufficient, 
 # further substantiates our unidimensionality assumption.
 
 ## Step 4: Model estimation, parameters, and fit statistics ##  ------
@@ -200,8 +199,6 @@ print(coefs) # Yielding model parameters: item discriminations (a) and threshold
 # participant with different levels of authoritarian personality. To interpret this, we could use a guideline from 
 # Baker (2017). RWA items, in general, have a moderate to very high ability to differentiate participants with different theta levels.
 # We can see that most items have 8 item threshold each (b1-b8), and this is because we have nine response options.
-# However, two items (Q6 and Q18) only have 7 item thresholds, and this is because no participant in our sample opted for/scored 
-# "9" for these two items.
 
 summary(fit) # Yielding factor loadings and communality (h2) from mirt model.
 
@@ -209,7 +206,7 @@ summary(fit) # Yielding factor loadings and communality (h2) from mirt model.
 # we are looking at the EFA results. The results are slightly different from our previous EFA analysis,
 # because mirt EFA using a quasi polychoric correlation matrix, while the one we ran earlier used a pearson 
 # correlation matrix. However, most importantly, we see that all items are significantly loaded to one factor, 
-# and the factor now substantially accounts for 61.1% of the variance in the data, which strengthens our assumption
+# and the factor now substantially accounts for 65.1% of the variance in the data, which strengthens our assumption
 # that the RWA scale is unidimensional.
 
 # Now, let's look at the (model and item) fit statistics
@@ -217,7 +214,8 @@ M2(fit, type="C2") # Running model fit analysis.
 # Apparently, our model, overall, does not fit well with the data. Could it be a problem of model misspecification?
 
 itemfit(fit) # Yielding item fit statistics.
-# Looking at RMSEA and p values of the scaled X2 statistics, we can see here that Q3, Q7, and Q13 are misfitting.
+# Looking at RMSEA and p values of the scaled X2 statistics, we can see here that
+# only Q2, Q4, and Q12 fit to our data.
 
 # Taking account the model and item fit statistics, it is very likely that we have problems with our model.
 # It could be a problem of model misspecification, or something else. We can identify potential problems by
@@ -243,36 +241,30 @@ for (i in 1:nrow(lar)) {
   cat(sprintf("A large residual correlation is found between item %d and item %d: %f\n", row, col, value))
 } # Now we detect the problematic pairs.
 
-# As we can see in the console, there are quite a lot of problematic items in the RWA scale. 
-# Q3, Q7, Q9, Q10, Q11, Q12, Q13, Q14, Q15, Q17, Q19, Q21, Q22 are strongly intercorrelated even though we have
-# accounted for the latent trait being measured.
+# According to this, it seems that there is no local dependency.
 
 # Let's see how Yen's Q3 statistics look like.
 q3 <- residuals(fit, type = "Q3") # Running Yen's Q3 statistics
 findCorrelation(q3, cutoff = 0.2, verbose = T) # Detecting problematic correlation pairs.
-# As we see here in the console that items Q4, Q5, Q6, Q7, Q11, Q13, Q14, Q15, Q18, Q19, Q21, Q22 are problematic.
+# As we see here in the console that items Q3, Q4, Q5, Q7, Q11, Q13, Q14, Q18, Q19, and Q21 are problematic.
 
 ## Step 6: Plots (item characteristics curve, item information curve, and test information curve) ##   ------
 
 # From the previous step, we found some problems with model misspecification. 
 # Let's take a look at the curves to closely examine the items.
 
-# Plotting Item Characteristics Curve (ICC) .
-tracePlot(fit, facet=T, title = "Item Characteristics Curves of RWA Scale") + labs(color="Response Options")
+# Plotting Category Probability Functions (CPF)
+tracePlot(fit, facet=T, title = "Category Probability Functions of RWA Scale") + labs(color="Response Options")
+# All CPFs of RWA items seem to be significantly overlapping, and are peaked on the right side of the curves.
+# This implies that RWA items are more sensitive to differentiate participants with high levels of authoritarian personality.
 
 # Plotting Item Information Curve (IIC).
 itemInfoPlot(fit, facet=T, title = "Item Information Curves of the RWA Scale")
-# Some items (Q4, Q9, Q11, Q13, Q15, Q21) seem to have atypical patterns. The curves of these items
-# have a slight dip on the right side and then increase a bit after that. It's very likely that these
-# curves have two peaks. Let's increase our theta range to look closely.
-
-itemInfoPlot(fit, facet=T, theta_range = c(-6,6), title = "Item Information Curves of the RWA Scale")# 
-# As we see here, the curves of those items have two peaks. This is an interesting situation which is caused by
-# a number of possibilities (model misspecification, poorly functioning items, violations of monotonicity, etc.).
+# Some items (Q1, Q5, Q6, Q8, Q9, Q11) seem to yield the least information compared to other items.
 
 # Plotting Test Information Curve.
 testInfoPlot(fit, title="Test Information Curve of the RWA Scale")
-# Apparently, the RWA scale is informative to measure participants with theta levels between -3SD to +2SD.
+# Apparently, the RWA scale is informative to measure participants with theta levels between -2SD to +4SD.
 
 ## Step 7: Computing reliability ##   ------
 
@@ -294,14 +286,14 @@ marginal_rxx(fit) # Calculating marginal reliability.
 
 # ...and then plot the marginal reliability across the latent trait spectrum.
 conRelPlot(fit, title="Reliability of the RWA Scale Given to the θ Level")
-# The RWA scale seems to be optimal (having sufficient reliability - >0.8) for measuring participants with theta levels between
-# -3SD and +4SD. However, there is an unusual dip on the right side of the curve.
+# The RWA scale seems to be optimal (having sufficient reliability - 0.75) for measuring participants with theta levels between
+# -2SD and +4SD. However, there is an unusual dip on the right side of the curve.
 
 # Let's compare IRT-based reliability and unweighted sum score based reliability.
 
 omega(rwa) # This script computes several reliability coefficients
-# As we see here, the RWA scale is internally consistent, but again, this does not negate the fact that there are
-# underlying problems with the scale, as we have seen in our previous analysis.
+# As we see here, the RWA scale is internally consistent.
 
 # Session Info ------
 sessionInfo()
+

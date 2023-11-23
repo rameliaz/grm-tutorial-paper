@@ -5,19 +5,19 @@ author:
   - name: Rizqy Amelia Zein
     corresponding: true
     orcid: 0000-0001-7840-0299
-    email: Amelia.Zein@psy.lmu.de
+    email: amelia.zein@psikologi.unair.ac.id
     affiliations:
-      - name: Ludwig-Maximilians-Universität
-        department: Department of Psychology
-        address: Leopoldstraße 13
-        city: Munich
-        postal-code: "80802"
       - name: Universitas Airlangga
         department: Department of Psychology
         address: Jalan Airlangga 4-6
         city: Surabaya
         region: Jawa Timur, Indonesia
         postal-code: "60286"
+      - name: Ludwig-Maximilians-Universität
+        department: Department of Psychology
+        address: Leopoldstraße 13
+        city: Munich
+        postal-code: "80802"
   - name: Hanif Akhtar
     orcid: 0000-0002-1388-7347
     affiliations:
@@ -45,22 +45,26 @@ bibliography: references.bib
 format:
   apaquarto-docx: default
 editor: visual
+execute: 
+  warning: false
+  error: false
+  output: false
+  echo: true
 ---
 
 {{< include _extensions/wjschne/apaquarto/_apa_title.qmd >}}
 
-```{r, echo=F, include=F}
-#| label: setup
-# install.packages("tidyverse", "psych", "devtools", "mirt", "caret", dependencies=TRUE) 
+```{r}
+#| include: false
+#| label: "setup"
+
+# install.packages("flextable", dependencies=TRUE) 
 # INFO: Remove the hashtag before install.package() to start installing packages (only if you have not had them installed)
-# devtools::install_github("masurp/ggmirt")
-# Now, we activate the package:
-library(tidyverse); library(psych); library(mirt); library(ggmirt); library(caret)
-ds <- read.csv("data/data.csv")
+library(flextable)
 
 ```
 
-Measurement lays an important foundation of psychological science. 
+Measurement, undoubtedly, is an important foundation of scientific research. Measurement process start with defining the construct being studied and then determine the assumptions
 
 # A Brief Overview of Item Response Theory
 
@@ -68,18 +72,235 @@ Measurement lays an important foundation of psychological science.
 
 # Assumptions and Key Concepts
 
+# Disclosure
+
+To maximise reproducibility of our analysis, we wrote the article as a Quarto (.qmd) document, where we integrate the R codes used in the analysis as well as its outputs. We also include the complete R script for the example we used as a supplementary document. The Quarto file (and its corresponding .docx and .pdf output) and R script are publicly available on (a Github repository)\[https://github.com/rameliaz/grm-tutorial-paper\].
+
 # An Illustrative Example of Graded Response Model: The Right Wing Authoritarianism (RWA) Scale
+
+To demonstrate the procedure of running a graded response model, we
+
 ## A Brief Overview of the Altemeyer's RWA Scale
+
 ## Step 1: Preparation
+
+```{r}
+
+install.packages("tidyverse", "psych", "devtools", "mirt", "caret", dependencies=TRUE)
+library(tidyverse); library(psych); library(mirt); library(caret)
+```
+
+Blabla
+
+```{r}
+
+# devtools::install_github("masurp/ggmirt")
+library(ggmirt)
+```
+
+Blabla
+
+```{r}
+ds <- read.csv("data/data.csv")
+```
+
+Blabla
+
+```{r}
+str(ds)
+```
+
+Blabla
+
+```{r}
+rwa <- subset(ds, select = Q1:Q22)
+str(rwa)
+```
+
+Blabla
+
 ## Step 2: Inspecting Key Descriptive Statistics
+
+```{r}
+psych::describe(rwa)
+```
+
+As we see in {apatb-table1}, nddasjdhajskdhaks
+
+```{r}
+unfav <- c("Q4","Q6","Q8","Q9","Q11","Q13","Q15","Q18","Q20","Q21") # Now we create a vector defining which items will be coded reversely.
+rwa <- rwa %>% 
+  mutate(across(all_of(unfav), ~ 9 - .))# We simply subtract the scores from 9 (the maximum) to reverse code the unfavorable items.
+```
+
+Kok ada nilai 0-nya? padahal kan skor minimalnya 1. Coba kita hitung frekuensi nilai 0 di tiap item.
+
+```{r}
+zero <- colSums(rwa == 0) / nrow(rwa) * 100 # Computing the frequency of "0" in each column.
+print(zero) # The proportion of "0" for each item.
+```
+
+```{r}
+rwa <- rwa %>%
+  mutate_all(~na_if(., 0)) %>%  # Replacing 0 with NA in all columns.
+  drop_na()  # Removing cases with any NA values.
+```
+
+Now let's look again at the descriptive statistics after we removed all NA cases.
+
+```{r}
+psych::describe(rwa)
+```
+
 ## Step 3: Examining Dimensionality
+
+```{r}
+#| eval: false
+
+irt.fa(rwa, nfactors = 1, fm = "minres")
+```
+
+```{r}
+#| eval: false
+
+fa.parallel(rwa, nfactors = 1, fm="minres", fa="fa", cor = "poly")
+```
+
+```{r}
+cor <- cor(rwa,method="pearson") # First, creating a (pearson) correlation matrix.
+efa <- fa(rwa, nfactors=1, fm="minres") # Now, running exploratory factor analysis. 
+print(efa) # Print the results.
+```
+
+Scree plot
+
+Now lets do parallel analysis
+
+```{r}
+pa <- fa.parallel(rwa, fm="minres", fa="fa") # Running a parallel analysis.
+pa$fa.values # Seeing the eigenvalues of each factor.
+```
+
 ## Step 4: Model Estimation, Parameters, and Fit Statistics
+
+```{r}
+model <- 'rwa = 1-22'
+```
+
+```{r}
+fit <- mirt(data=rwa, 1, model=model, itemtype="graded", SE=T, verbose=F)
+```
+
+```{r}
+coefs <- coef(fit, IRTpars=T, simplify=T) # Storing model parameters in a data frame.
+print(coefs) # Yielding model parameters: item discriminations (a) and threshold (b).
+```
+
+```{r}
+summary(fit)
+```
+
+lhalalala
+
+```{r}
+M2(fit, type="C2")
+```
+
+lhalalala
+
+```{r}
+#| include: false
+
+m2_results <- M2(fit, type="C2")
+m2_stat <- m2_results$M2
+df <- m2_results$df
+p_value <- m2_results$p.value
+rmsea <- m2_results$RMSEA
+srmr <- m2_results$SRMR
+tli <- m2_results$TLI
+cfi <- m2_results$CFI
+```
+
+According to our analysis, the model does not fit the data well (*M*(`r df`) = `r m2_stat`, *p* = `r p_value`, *RMSEA* = `r rmsea`, )
+
+```{r}
+item.fit <- itemfit(fit)
+```
+
 ## Step 5: Model Residuals
+
+```{r}
+ld <- residuals(fit, type = "LD") # Running local dependency statistics
+up <- which(upper.tri(ld), arr.ind = T) # Extracting values only on the upper side of the diagonal.
+lar <- up[ld[up] > 0.2 | ld[up] < -0.2, ] # Defining unusually large residuals (>0.2).
+```
+
+lhalalala
+
+```{r}
+for (i in 1:nrow(lar)) {
+  row <- lar[i, 1]
+  col <- lar[i, 2]
+  value <- ld[row, col]
+  cat(sprintf("A large residual correlation is found between item %d and item %d: %f\n", row, col, value))
+} # Now we detect the problematic pairs.
+```
+
+lhalalala
+
+```{r}
+q3 <- residuals(fit, type = "Q3") # Running Yen's Q3 statistics
+findCorrelation(q3, cutoff = 0.2, verbose = T) # Detecting problematic correlation pairs.
+```
+
 ## Step 6: IRT Plots
+
+Now spit out the
+
+```{r}
+tracePlot(fit, facet=T, title = "Category Probability Functions of RWA Scale") + labs(color="Response Options")
+```
+
+lhalalala
+
+```{r}
+itemInfoPlot(fit, facet=T, title = "Item Information Curves of the RWA Scale")
+```
+
+lhalalala
+
+```{r}
+#| output: false
+
+itemInfoPlot(fit, facet=T, theta_range = c(-6,6), title = "Item Information Curves of the RWA Scale")#
+```
+
+lhalalala
+
+```{r}
+testInfoPlot(fit, title="Test Information Curve of the RWA Scale")
+```
+
 ## Step 7: Computing Reliability
 
-# Conclusions
+```{r}
+theta_se <- fscores(fit, full.scores.SE = T) # Extracting the estimated theta score of each participant.
+e_rel <- empirical_rxx(theta_se) # Then use the estimated theta to calculate empirical reliability.
+```
 
+lhalalala
+
+```{r}
+m_rel <- marginal_rxx(fit)
+```
+
+lhalalala
+
+```{r}
+omega(rwa)
+```
+
+# Conclusions
 
 {{< pagebreak >}}
 
@@ -87,3 +308,267 @@ Measurement lays an important foundation of psychological science.
 
 ::: {#refs}
 :::
+
+{{< pagebreak >}}
+
+```{r apatb-table1}
+#| output: true
+#| echo: false
+#| apa-cap: Descriptive Statistics of RWA Scale
+#| apa-note: SD = Standard Deviation
+#| ft.align: left
+
+# Transforming describe() output into a APA-formatted table
+table1 <- psych::describe(rwa); table1 <- as.data.frame(table1)
+table1 <- table1 %>% 
+  rownames_to_column(var="Item") %>% 
+  select(Item, mean, sd, min, max, range, n) %>% 
+  rename(Mean=mean, SD=sd, Minimum=min, Maximum=max, Range=range) %>% 
+  flextable() %>%
+  theme_apa() %>% 
+  line_spacing(part = "all") %>% 
+  padding(padding.top = 5, padding.bottom = 5)
+
+table1 <- colformat_double(x=table1, j="Minimum", digits = 0)
+table1 <- colformat_double(x=table1, j="Maximum", digits = 0)
+table1 <- colformat_double(x=table1, j="Range", digits = 0)
+table1 <- colformat_double(x=table1, j="n", digits = 0)
+
+table1
+```
+
+{{< pagebreak >}}
+
+```{r apatb-table2}
+#| output: true
+#| echo: false
+#| apa-cap: Descriptive Statistics of RWA Scale
+#| apa-note: SD = Standard Deviation, Descriptive Statistics After Reversing Unfavorable Items
+#| ft.align: left
+
+# Transforming describe() output into a APA-formatted table
+unfav <- c("Q4","Q6","Q8","Q9","Q11","Q13","Q15","Q18","Q20","Q21") # Now we create a vector defining which items will be coded reversely.
+rwa <- rwa %>% 
+  mutate(across(all_of(unfav), ~ 9 - .))# We simply subtract the scores from 9 (the maximum) to reverse code the unfavorable items.
+
+table2 <- psych::describe(rwa); table2 <- as.data.frame(table2)
+table2 <- table2 %>% 
+  rownames_to_column(var="Item") %>% 
+  select(Item, mean, sd, min, max, range, n) %>% 
+  rename(Mean=mean, SD=sd, Minimum=min, Maximum=max, Range=range) %>% 
+  flextable() %>% 
+  theme_apa() %>% 
+  line_spacing(part = "all") %>% 
+  padding(padding.top = 5, padding.bottom = 5)
+
+table2 <- colformat_double(x=table2, j="Minimum", digits = 0)
+table2 <- colformat_double(x=table2, j="Maximum", digits = 0)
+table2 <- colformat_double(x=table2, j="Range", digits = 0)
+table2 <- colformat_double(x=table2, j="n", digits = 0)
+
+table2
+```
+
+{{< pagebreak >}}
+
+```{r apatb-table3}
+#| output: true
+#| echo: false
+#| apa-cap: Percentge of Zero in Each Item
+#| ft.align: left
+
+table3 <- as.data.frame(zero)
+
+table3 <- table3 %>% 
+  rownames_to_column(var="Item") %>% 
+  select(Item, zero) %>% 
+  rename(Percentage=zero) %>% 
+  flextable() %>% 
+  theme_apa() %>% 
+  line_spacing(part = "all") %>% 
+  padding(padding.top = 5, padding.bottom = 5)
+
+table3
+
+```
+
+{{< pagebreak >}}
+
+```{r apatb-table4}
+#| output: true
+#| echo: false
+#| apa-cap: Descriptive Statistics of RWA Scale
+#| apa-note: SD = Standard Deviation, Descriptive Statistics After Reversing Unfavorable Items
+#| ft.align: left
+
+rwa <- rwa %>%
+  mutate_all(~na_if(., 0)) %>%  # Replacing 0 with NA in all columns.
+  drop_na()  # Removing cases with any NA values.
+
+# Transforming describe() output into a APA-formatted table
+table4 <- psych::describe(rwa); table4 <- as.data.frame(table4)
+table4 <- table4 %>% 
+  rownames_to_column(var="Item") %>% 
+  select(Item, mean, sd, min, max, range, n) %>% 
+  rename(Mean=mean, SD=sd, Minimum=min, Maximum=max, Range=range) %>% 
+  flextable() %>% 
+  theme_apa() %>% 
+  line_spacing(part = "all") %>% 
+  padding(padding.top = 5, padding.bottom = 5)
+
+table4 <- colformat_double(x=table4, j="Minimum", digits = 0)
+table4 <- colformat_double(x=table4, j="Maximum", digits = 0)
+table4 <- colformat_double(x=table4, j="Range", digits = 0)
+table4 <- colformat_double(x=table4, j="n", digits = 0)
+
+table4
+```
+
+{{< pagebreak >}}
+
+```{r fig1}
+#| output: true
+#| echo: false
+#| label: apafg-fig1
+#| apa-cap: Scree Plot
+#| apa-note: NULL
+
+plot(efa$values, type = "b", main = "Scree Plot", xlab = "Factor", ylab = "Eigenvalue") # Scree plot
+abline(h = 1, col = "red", lty = 2) # Add new line to factor 1.
+
+```
+
+{{< pagebreak >}}
+
+```{r fig2}
+#| output: true
+#| echo: false
+#| label: apafg-fig2
+#| apa-cap: Parallel Analysis
+#| apa-note: NULL
+
+plot(pa)
+```
+
+{{< pagebreak >}}
+
+```{r apatb-table5}
+#| output: true
+#| echo: false
+#| apa-cap:  Descriptive Statistics of RWA Scale
+#| apa-note: SD = Standard Deviation, Descriptive Statistics After Reversing Unfavorable Items
+#| ft.align: left
+
+table5 <- as.data.frame(coefs$items)
+
+table5 <- table5 %>% 
+  rownames_to_column(var="Item") %>% 
+  select(Item, a, b1, b2, b3, b4, b5, b6, b7, b8) %>% 
+  rename(α=a, β1=b1, β2=b2, β3=b3, β4=b4, β5=b5, β6=b6, β7=b7, β8=b8) %>% 
+  flextable() %>% 
+  theme_apa() %>% 
+  line_spacing(part = "all") %>% 
+  padding(padding.top = 5, padding.bottom = 5)
+
+table5 <- colformat_double(x=table5, j="α", digits = 2)
+table5 <- colformat_double(x=table5, j="β1", digits = 2)
+table5 <- colformat_double(x=table5, j="β2", digits = 2)
+table5 <- colformat_double(x=table5, j="β3", digits = 2)
+table5 <- colformat_double(x=table5, j="β4", digits = 2)
+table5 <- colformat_double(x=table5, j="β5", digits = 2)
+table5 <- colformat_double(x=table5, j="β6", digits = 2)
+table5 <- colformat_double(x=table5, j="β7", digits = 2)
+table5 <- colformat_double(x=table5, j="β8", digits = 2)
+
+table5
+
+```
+
+{{< pagebreak >}}
+
+```{r apatb-table6}
+#| output: true
+#| echo: false
+#| apa-cap: Descriptive Statistics of RWA Scale
+#| apa-note: SD = Standard Deviation, Descriptive Statistics After Reversing Unfavorable Items
+#| ft.align: left
+
+table6 <- as.data.frame(item.fit)
+
+table6 <- table6 %>%
+  select(item, S_X2, df.S_X2, RMSEA.S_X2, p.S_X2) %>% 
+  rename(Item=item) %>% 
+  flextable() %>% 
+  theme_apa() %>% 
+  line_spacing(part = "all") %>% 
+  padding(padding.top = 5, padding.bottom = 5)
+
+table6 <- colformat_double(x=table6, j="S_X2", digits = 2)
+table6 <- colformat_double(x=table6, j="df.S_X2", digits = 2)
+table6 <- colformat_double(x=table6, j="RMSEA.S_X2", digits = 2)
+table6 <- colformat_double(x=table6, j="p.S_X2", digits = 2)
+
+
+table6
+
+```
+
+{{< pagebreak >}}
+
+```{r fig3}
+#| output: true
+#| echo: false
+#| label: apafg-fig3
+#| apa-cap: Category Probability Functions of RWA Scale
+#| apa-note: NULL
+
+tracePlot(fit, facet=T, title = "Category Probability Functions of RWA Scale") + labs(color="Response Options")
+```
+
+{{< pagebreak >}}
+
+```{r fig4}
+#| output: true
+#| echo: false
+#| label: apafg-fig4
+#| apa-cap: Item Information Curves of the RWA Scale
+#| apa-note: NULL
+
+itemInfoPlot(fit, facet=T, title = "Item Information Curves of the RWA Scale")
+```
+
+{{< pagebreak >}}
+
+```{r fig5}
+#| output: true
+#| echo: false
+#| label: apafg-fig5
+#| apa-cap:  Item Information Curves of the RWA Scale Ranging from -6 to +6 Standard Deviation
+#| apa-note: NULL
+
+itemInfoPlot(fit, facet=T, theta_range = c(-6,6), title = "Item Information Curves of the RWA Scale")#
+```
+
+{{< pagebreak >}}
+
+```{r fig6}
+#| output: true
+#| echo: false
+#| label: apafg-fig6
+#| apa-cap: Test Information Curve of the RWA Scale
+#| apa-note: NULL
+
+testInfoPlot(fit, title="Test Information Curve of the RWA Scale")
+```
+
+{{< pagebreak >}}
+
+```{r fig7}
+#| output: true
+#| echo: false
+#| label: apafg-fig7
+#| apa-cap: Reliability of the RWA Scale Given to the θ Level
+#| apa-note: NULL
+
+conRelPlot(fit, title="Reliability of the RWA Scale Given to the θ Level")
+```
