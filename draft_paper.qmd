@@ -58,23 +58,39 @@ execute:
 #| include: false
 #| label: "setup"
 
-# install.packages("flextable", dependencies=TRUE) 
-# INFO: Remove the hashtag before install.package() to start installing packages (only if you have not had them installed)
+install.packages("flextable", dependencies=TRUE) 
 library(flextable)
-
 ```
 
-Measurement, undoubtedly, is an important foundation of scientific research. Measurement process start with defining the construct being studied and then determine the assumptions
+A foundation of scientific research is a measurement process, which starts from defining the construct being measured, determining measurement assumptions, and inspecting its measurement validity and precision. To illustrate this process, consider a researcher designs a study aiming to identify the association between authoritarian disposition and prejudice toward a social group. As the first step, they must clearly define the variables they are interested in and determine a strategy to measure those variables accurately. Ensuring that the measurement strategy precisely measure what it is intended to measure often poses a challenge to applied psychology researchers because, most of the time, we have no direct access to observe most psychological constructs. Instead, we rely on statistical techniques, which assume that non-observable psychological constructs are "out there," or later we call this variable a *latent construct* or a *manifest variable*. More sharply, we create materials, such as scale items, stimulus, tasks, observation check-lists, etc. that we *assume* to represent these underlying latent construct (or constructs) being measured.
+
+Relatedly, as most psychological constructs are not directly observable, the questions on whether a scale actually measures what it is intended to measure (i.e., construct validity, see @cronbachConstructValidityPsychological1955) becomes critical. Construct validity, as argued by @cronbachConstructValidityPsychological1955, can be sustained by linking test scores to other constructs in which researchers theoretically assume to be related with the construct of interest. Further, @cronbachConstructValidityPsychological1955 introduce the notion of "nomological network," which refers to a theoretical framework connecting the measured construct with other (theoretically) related constructs and relevant observations. Therefore, validity of the test depends on the behavior of the construct of interest: whether or not it behaves as specified in the theory within this network. To scrutinize test validity, researchers correlate the test score with some criterion (i.e., constructs or future/current behaviors theoretically related to the measured construct), and this is a common and widespread practices in psychology [@zumboSettingStageValidity2014]. 
+
+However, validity theory has evolved over time and been expanded since. Rather than a property of a specific test, scholars argue that validity of a scale refers to questions about its consequential aspects [@kaneValidatingInterpretationsUses2013; @kaneValidityEvaluationClaims2016; @messickValidityPsychologicalAssessment1995]. In this sense, a test is deemed valid when researchers can demonstrate evidence for articulating a logical argument [@kaneValidatingInterpretationsUses2013; @kaneValidityEvaluationClaims2016] in defending test interpretations and its practical use [@messickValidityPsychologicalAssessment1995]. Consequently, scholars argue that scale validity is an ongoing process in which researchers should continually and incrementally gather (and report) the evidence for validity as an important complement to ensure the credibility of their findings [@flakeConstructValidationSocial2017; @messickValidityPsychologicalAssessment1995; @zumboSettingStageValidity2014]. 
+
+Yet in practice, researchers pay far less attention to the validity (and reliability) of their measures. According to a study examining articles published in a flagship journal in the field of social and personality psychology shows that only a little more than half (53%) of sample articles cited validity evidence from previous validation studies but 19% of those articles had adapted or modified the measures in various fashions so that the evidence for validity may not extend to the modified scales [@flakeConstructValidationSocial2017]. A larger study tapping into fifteen commonly used measures in social and personality psychology (e.g., Big Five Inventory, belief in just world scale, need for cognitive closure scale, etc.) even paints a grimmer picture [@husseyHiddenInvalidity152020]. While majority of the tested scales (88%) purportedly had good validity, a more exhaustive examination (i.e., internal consistency, test-retest reliability, factor structure, and invariance) demonstrated that only 4% of these scales actually possess good validity [@husseyHiddenInvalidity152020]. Furthermore, applied psychological researchers seem to be less aware of assumptions underlying their chosen method for evaluating scale reliability. For example, while Cronbach's $\alpha$ is always almost reported [@flakeStrengtheningFoundationEducational2021] and continuously popular [@mcneishThanksCoefficientAlpha2018], it is unclear that researchers are aware of its underlying assumptions (that true scores and item variances should be equal and that item residuals should be uncorrelated, i.e., $\tau$ equivalence), and thus, makes its usefulness extremely limited [@sijtsmaUseMisuseVery2008].
+
+With this in mind, it is not surprising that researchers' lack of attention to their measurement quality raises questions about replicability of their findings [@flakeMeasurementSchmeasurementQuestionable2020; @lilienfeldPsychologicalMeasurementReplication2020]. In this sense, a serious doubt about the validity of the measures used in a study can affect the validity of the findings, and the decisions that leads to this doubt is called *questionable measurement practice* (QMP, see @flakeMeasurementSchmeasurementQuestionable2020. The difficulty to reach a consensus about the best way to measure a certain construct is also a major downstream consequence of the lack of validity reporting and may become a major obstacle to establish cumulative psychological science [@elsonPsychologicalMeasuresAren2023]. 
+
+Therefore, it is very important to equip applied psychological researchers with practical steps to systematically evaluate their measurement validity and precision. By expanding their measurement evaluation toolkit, applied psychological researchers can ensure the quality of their findings and enable them to contribute to cumulative science. 
+
+In this article, we aim to gently introduce a graded response model (GRM), a family of item response model, 
+
+A meta-communicative cue here---
 
 # A Brief Overview of Item Response Theory
+* Contrasting the concept of validity in IRT and CTT
+* Contrasting the concept of measurement precision in IRT and CTT
+Inserting {apatb-table1}
 
 # Graded Response Model
+Jelasin konsep dasarnya dan plot-plotnya apa aja bedanya sama  inserting {apafg-fig1}
 
-# Assumptions and Key Concepts
+## Assumptions
+Jelasin dua asumsi penting: unidimensionality dan local independence. 
 
-# Disclosure
-
-To maximise reproducibility of our analysis, we wrote the article as a Quarto (.qmd) document, where we integrate the R codes used in the analysis as well as its outputs. We also include the complete R script for the example we used as a supplementary document. The Quarto file (and its corresponding .docx and .pdf output) and R script are publicly available on (a Github repository)\[https://github.com/rameliaz/grm-tutorial-paper\].
+# Disclosure and Data Availability Statements
+To maximise reproducibility of our analysis, we wrote the article as a Quarto (.qmd) document, where we integrate the R codes used in the analysis as well as its outputs. We also include the complete R script for the example we used as a supplementary document. The Quarto file (and its corresponding .docx and .pdf output) and R script are publicly available on [a Github repository](https://github.com/rameliaz/grm-tutorial-paper). To demonstrate the use of GRM, we use a dataset obtained from [Open-Source Psychometrics Project](http://openpsychometrics.org/_rawdata/), which is publicly available. 
 
 # An Illustrative Example of Graded Response Model: The Right Wing Authoritarianism (RWA) Scale
 
@@ -85,17 +101,14 @@ To demonstrate the procedure of running a graded response model, we
 ## Step 1: Preparation
 
 ```{r}
-
 install.packages("tidyverse", "psych", "devtools", "mirt", "caret", dependencies=TRUE)
-library(tidyverse); library(psych); library(mirt); library(caret)
+devtools::install_github("masurp/ggmirt") # remote installation through GitHub repository
 ```
 
 Blabla
 
 ```{r}
-
-# devtools::install_github("masurp/ggmirt")
-library(ggmirt)
+library(ggmirt); library(tidyverse); library(psych); library(mirt); library(caret)
 ```
 
 Blabla
@@ -125,20 +138,14 @@ Blabla
 psych::describe(rwa)
 ```
 
-As we see in {apatb-table1}, nddasjdhajskdhaks
-
-```{r}
-unfav <- c("Q4","Q6","Q8","Q9","Q11","Q13","Q15","Q18","Q20","Q21") # Now we create a vector defining which items will be coded reversely.
-rwa <- rwa %>% 
-  mutate(across(all_of(unfav), ~ 9 - .))# We simply subtract the scores from 9 (the maximum) to reverse code the unfavorable items.
-```
-
-Kok ada nilai 0-nya? padahal kan skor minimalnya 1. Coba kita hitung frekuensi nilai 0 di tiap item.
+As we see in {apatb-table2}, Kok ada nilai 0-nya? padahal kan skor minimalnya 1. Coba kita hitung frekuensi nilai 0 di tiap item.
 
 ```{r}
 zero <- colSums(rwa == 0) / nrow(rwa) * 100 # Computing the frequency of "0" in each column.
 print(zero) # The proportion of "0" for each item.
 ```
+
+Kita anggap nilai 0 adalah NA dan kita delete semua case dengan nilai NA
 
 ```{r}
 rwa <- rwa %>%
@@ -146,10 +153,12 @@ rwa <- rwa %>%
   drop_na()  # Removing cases with any NA values.
 ```
 
-Now let's look again at the descriptive statistics after we removed all NA cases.
+Kalau lihat di {apatb-table2}, meannya kok beda2? oh iya karena ada unfavorable items. Ayo kita reverse score dulu ya.
 
 ```{r}
-psych::describe(rwa)
+unfav <- c("Q4","Q6","Q8","Q9","Q11","Q13","Q15","Q18","Q20","Q21") # Now we create a vector defining which items will be coded reversely.
+rwa <- rwa %>% 
+  mutate(across(all_of(unfav), ~ 10 - .))# We simply subtract the scores from 9 (the maximum) + 1 to reverse code the unfavorable items.
 ```
 
 ## Step 3: Examining Dimensionality
@@ -160,11 +169,15 @@ psych::describe(rwa)
 irt.fa(rwa, nfactors = 1, fm = "minres")
 ```
 
+lalalala
+
 ```{r}
 #| eval: false
 
 fa.parallel(rwa, nfactors = 1, fm="minres", fa="fa", cor = "poly")
 ```
+
+lalalalal
 
 ```{r}
 cor <- cor(rwa,method="pearson") # First, creating a (pearson) correlation matrix.
@@ -177,9 +190,16 @@ Scree plot
 Now lets do parallel analysis
 
 ```{r}
-pa <- fa.parallel(rwa, fm="minres", fa="fa") # Running a parallel analysis.
-pa$fa.values # Seeing the eigenvalues of each factor.
+pa <- fa.parallel(rwa, fm="minres", fa="fa")
 ```
+
+lalalala
+
+```{r}
+pa$fa.values
+```
+
+Eigenvalues `12.225/0.843`
 
 ## Step 4: Model Estimation, Parameters, and Fit Statistics
 
@@ -187,20 +207,26 @@ pa$fa.values # Seeing the eigenvalues of each factor.
 model <- 'rwa = 1-22'
 ```
 
+lalalala
+
 ```{r}
 fit <- mirt(data=rwa, 1, model=model, itemtype="graded", SE=T, verbose=F)
 ```
+
+llalalala
 
 ```{r}
 coefs <- coef(fit, IRTpars=T, simplify=T) # Storing model parameters in a data frame.
 print(coefs) # Yielding model parameters: item discriminations (a) and threshold (b).
 ```
 
+lalalala
+
 ```{r}
-summary(fit)
+summary(fit) 
 ```
 
-lhalalala
+bla bla lhalalala
 
 ```{r}
 M2(fit, type="C2")
@@ -212,13 +238,19 @@ lhalalala
 #| include: false
 
 m2_results <- M2(fit, type="C2")
+m2_results[] <- lapply(m2_results, as.numeric)
 m2_stat <- m2_results$M2
+m2_stat = round(m2_stat, digits = 3)
 df <- m2_results$df
 p_value <- m2_results$p.value
 rmsea <- m2_results$RMSEA
-srmr <- m2_results$SRMR
+rmsea = round(rmsea, digits=3)
+srmsr <- m2_results$SRMSR
+srmsr = round(srmsr, digits=3)
 tli <- m2_results$TLI
+tli = round(tli, digits=3)
 cfi <- m2_results$CFI
+cfi = round(cfi, digits=3)
 ```
 
 According to our analysis, the model does not fit the data well (*M*(`r df`) = `r m2_stat`, *p* = `r p_value`, *RMSEA* = `r rmsea`, )
@@ -238,6 +270,8 @@ lar <- up[ld[up] > 0.2 | ld[up] < -0.2, ] # Defining unusually large residuals (
 lhalalala
 
 ```{r}
+#| eval: false
+
 for (i in 1:nrow(lar)) {
   row <- lar[i, 1]
   col <- lar[i, 2]
@@ -265,14 +299,6 @@ lhalalala
 
 ```{r}
 itemInfoPlot(fit, facet=T, title = "Item Information Curves of the RWA Scale")
-```
-
-lhalalala
-
-```{r}
-#| output: false
-
-itemInfoPlot(fit, facet=T, theta_range = c(-6,6), title = "Item Information Curves of the RWA Scale")#
 ```
 
 lhalalala
@@ -311,7 +337,38 @@ omega(rwa)
 
 {{< pagebreak >}}
 
-```{r apatb-table1}
+```{r}
+#| label: apatb-table1
+#| apa-cap: Comparison Between Common IRT Models
+#| apa-note: NULL
+#| echo: false
+```
+
+| Model                                   | Key Characteristics                                                                                                                                                                                                                                     | Data Type   | Response Options        |
+|-----------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------|-------------------------|
+| 1-PL Model (Rasch Model)                | 1. Estimates only item difficulties (a). 2. Assumes that all items have the same discrimination parameters (b). 3. Item and person parameters are independent.                                                                                          | Dichotomous | Correct/Incorrect (0/1) |
+| 2-PL Model                              | 1. Estimates item difficulties (a) and item discriminations (b). 2. Less stringent than 1-PL model since it allows item discrimination parameters (b) to vary.                                                                                          | Dichotomous | Correct/Incorrect (0/1) |
+| 3-PL Model                              | 1. Estimates item difficulties (a), discriminations (b), and pseudo-guessing parameters (c). 2. Appropriate for modeling a test data with multiple responses (e.g., multiple-choice tests), and thus, guessing might influence participants' responses. | Dichotomous | Correct/Incorrect (0/1) |
+| Graded Response Model (GRM)             | 1. Appropriate for modeling ordinal data with more than two response categories (i.e., Likert-style). 2. Estimates a discrimination parameter (a) and multiple threshold parameters (b) per item.                                                       | Polytomous  | Ordered Categories      |
+| Partial Credit Model (PCM)              | 1. An extension of the 1-PL (Rasch) model for polytomous items. 2. Estimates thresholds between adjacent categories but assumes equal discrimination across items.                                                                                      | Polytomous  | Ordered Categories      |
+| Generalized Partial Credit Model (GPCM) | Extending PCM to allow differential discrimination parameters across items.                                                                                                                                                                             | Polytomous  | Ordered Categories      |
+| Nominal Response Model (NRM)            | 1. Appropriate for modeling categorical responses with no order. 2. Estimates discrimination parameters (a) and multiple category-specific parameters (b).                                                                                              | Categorical | Unordered Categories    |
+
+{{< pagebreak >}}
+
+```{r}
+#| label: apafg-fig1
+#| apa-cap: An Item Probability Function from a GRM Model
+#| apa-note: NULL
+#| output: true
+#| echo: false
+
+knitr::include_graphics("CPF example.png")
+```
+
+{{< pagebreak >}}
+
+```{r apatb-table2}
 #| output: true
 #| echo: false
 #| apa-cap: Descriptive Statistics of RWA Scale
@@ -319,6 +376,7 @@ omega(rwa)
 #| ft.align: left
 
 # Transforming describe() output into a APA-formatted table
+rwa <- subset(ds, select = Q1:Q22)
 table1 <- psych::describe(rwa); table1 <- as.data.frame(table1)
 table1 <- table1 %>% 
   rownames_to_column(var="Item") %>% 
@@ -328,29 +386,29 @@ table1 <- table1 %>%
   theme_apa() %>% 
   line_spacing(part = "all") %>% 
   padding(padding.top = 5, padding.bottom = 5)
-
 table1 <- colformat_double(x=table1, j="Minimum", digits = 0)
 table1 <- colformat_double(x=table1, j="Maximum", digits = 0)
 table1 <- colformat_double(x=table1, j="Range", digits = 0)
 table1 <- colformat_double(x=table1, j="n", digits = 0)
-
 table1
 ```
 
 {{< pagebreak >}}
 
-```{r apatb-table2}
+```{r apatb-table3}
 #| output: true
 #| echo: false
 #| apa-cap: Descriptive Statistics of RWA Scale
-#| apa-note: SD = Standard Deviation, Descriptive Statistics After Reversing Unfavorable Items
+#| apa-note: Descriptive Statistics After Reversing Unfavorable Items and removing cases with NA. SD = Standard Deviation.
 #| ft.align: left
 
-# Transforming describe() output into a APA-formatted table
+rwa <- rwa %>%
+  mutate_all(~na_if(., 0)) %>%  # Replacing 0 with NA in all columns.
+  drop_na()  # Removing cases with any NA values.
 unfav <- c("Q4","Q6","Q8","Q9","Q11","Q13","Q15","Q18","Q20","Q21") # Now we create a vector defining which items will be coded reversely.
 rwa <- rwa %>% 
-  mutate(across(all_of(unfav), ~ 9 - .))# We simply subtract the scores from 9 (the maximum) to reverse code the unfavorable items.
-
+  mutate(across(all_of(unfav), ~ 10 - .))# We simply subtract the scores from 9 (the maximum) to reverse code the unfavorable items.
+# Transforming describe() output into a APA-formatted table
 table2 <- psych::describe(rwa); table2 <- as.data.frame(table2)
 table2 <- table2 %>% 
   rownames_to_column(var="Item") %>% 
@@ -360,76 +418,19 @@ table2 <- table2 %>%
   theme_apa() %>% 
   line_spacing(part = "all") %>% 
   padding(padding.top = 5, padding.bottom = 5)
-
 table2 <- colformat_double(x=table2, j="Minimum", digits = 0)
 table2 <- colformat_double(x=table2, j="Maximum", digits = 0)
 table2 <- colformat_double(x=table2, j="Range", digits = 0)
 table2 <- colformat_double(x=table2, j="n", digits = 0)
-
 table2
 ```
 
 {{< pagebreak >}}
 
-```{r apatb-table3}
+```{r fig2}
 #| output: true
 #| echo: false
-#| apa-cap: Percentge of Zero in Each Item
-#| ft.align: left
-
-table3 <- as.data.frame(zero)
-
-table3 <- table3 %>% 
-  rownames_to_column(var="Item") %>% 
-  select(Item, zero) %>% 
-  rename(Percentage=zero) %>% 
-  flextable() %>% 
-  theme_apa() %>% 
-  line_spacing(part = "all") %>% 
-  padding(padding.top = 5, padding.bottom = 5)
-
-table3
-
-```
-
-{{< pagebreak >}}
-
-```{r apatb-table4}
-#| output: true
-#| echo: false
-#| apa-cap: Descriptive Statistics of RWA Scale
-#| apa-note: SD = Standard Deviation, Descriptive Statistics After Reversing Unfavorable Items
-#| ft.align: left
-
-rwa <- rwa %>%
-  mutate_all(~na_if(., 0)) %>%  # Replacing 0 with NA in all columns.
-  drop_na()  # Removing cases with any NA values.
-
-# Transforming describe() output into a APA-formatted table
-table4 <- psych::describe(rwa); table4 <- as.data.frame(table4)
-table4 <- table4 %>% 
-  rownames_to_column(var="Item") %>% 
-  select(Item, mean, sd, min, max, range, n) %>% 
-  rename(Mean=mean, SD=sd, Minimum=min, Maximum=max, Range=range) %>% 
-  flextable() %>% 
-  theme_apa() %>% 
-  line_spacing(part = "all") %>% 
-  padding(padding.top = 5, padding.bottom = 5)
-
-table4 <- colformat_double(x=table4, j="Minimum", digits = 0)
-table4 <- colformat_double(x=table4, j="Maximum", digits = 0)
-table4 <- colformat_double(x=table4, j="Range", digits = 0)
-table4 <- colformat_double(x=table4, j="n", digits = 0)
-
-table4
-```
-
-{{< pagebreak >}}
-
-```{r fig1}
-#| output: true
-#| echo: false
-#| label: apafg-fig1
+#| label: apafg-fig2
 #| apa-cap: Scree Plot
 #| apa-note: NULL
 
@@ -440,10 +441,10 @@ abline(h = 1, col = "red", lty = 2) # Add new line to factor 1.
 
 {{< pagebreak >}}
 
-```{r fig2}
+```{r fig3}
 #| output: true
 #| echo: false
-#| label: apafg-fig2
+#| label: apafg-fig3
 #| apa-cap: Parallel Analysis
 #| apa-note: NULL
 
@@ -452,77 +453,68 @@ plot(pa)
 
 {{< pagebreak >}}
 
+```{r}
+#| include: false
+
+sum <- summary(fit) 
+```
+
+```{r apatb-table4}
+#| output: true
+#| echo: false
+#| apa-cap: Item Parameters
+#| apa-note: λ = Standardized Factor Loadings, h2 = Commonality, α = Discrimination, β1.4 = Response specific difficulty parameters (item threshold).
+#| ft.align: left
+#| column: page
+
+table3 <- as.data.frame(coefs$items)
+load <- as.data.frame(sum$rotF)
+h2 <- as.data.frame(sum$h2)
+table3 <- cbind(table3, load, h2)
+table3 <- table3 %>% 
+  rownames_to_column(var="Item") %>% 
+  select(Item, a, b1, b2, b3, b4, b5, b6, b7, b8, rwa, h2) %>% 
+  rename(α=a, β1=b1, β2=b2, β3=b3, β4=b4, β5=b5, β6=b6, β7=b7, β8=b8, λ=rwa) %>% 
+  flextable() %>% 
+  theme_apa() %>% 
+  line_spacing(part = "all") %>% 
+  padding(padding.top = 5, padding.bottom = 5)
+table3 <- colformat_double(x=table3, j="α", digits = 2)
+table3 <- colformat_double(x=table3, j="β1", digits = 2)
+table3 <- colformat_double(x=table3, j="β2", digits = 2)
+table3 <- colformat_double(x=table3, j="β3", digits = 2)
+table3 <- colformat_double(x=table3, j="β4", digits = 2)
+table3 <- colformat_double(x=table3, j="β5", digits = 2)
+table3 <- colformat_double(x=table3, j="β6", digits = 2)
+table3 <- colformat_double(x=table3, j="β7", digits = 2)
+table3 <- colformat_double(x=table3, j="β8", digits = 2)
+table3
+
+```
+
+{{< pagebreak >}}
+
 ```{r apatb-table5}
 #| output: true
 #| echo: false
-#| apa-cap:  Descriptive Statistics of RWA Scale
-#| apa-note: SD = Standard Deviation, Descriptive Statistics After Reversing Unfavorable Items
+#| apa-cap: Item Fit Statistics
+#| apa-note: Scaled χ2 Statistics. RMSEA = root mean square error of approximation, CFI = comparative fit index, TLI = Tucker-Lewis index, SRMR = Standardized Root Mean Square Residual.
 #| ft.align: left
 
-table5 <- as.data.frame(coefs$items)
-
-table5 <- table5 %>% 
-  rownames_to_column(var="Item") %>% 
-  select(Item, a, b1, b2, b3, b4, b5, b6, b7, b8) %>% 
-  rename(α=a, β1=b1, β2=b2, β3=b3, β4=b4, β5=b5, β6=b6, β7=b7, β8=b8) %>% 
-  flextable() %>% 
-  theme_apa() %>% 
-  line_spacing(part = "all") %>% 
-  padding(padding.top = 5, padding.bottom = 5)
-
-table5 <- colformat_double(x=table5, j="α", digits = 2)
-table5 <- colformat_double(x=table5, j="β1", digits = 2)
-table5 <- colformat_double(x=table5, j="β2", digits = 2)
-table5 <- colformat_double(x=table5, j="β3", digits = 2)
-table5 <- colformat_double(x=table5, j="β4", digits = 2)
-table5 <- colformat_double(x=table5, j="β5", digits = 2)
-table5 <- colformat_double(x=table5, j="β6", digits = 2)
-table5 <- colformat_double(x=table5, j="β7", digits = 2)
-table5 <- colformat_double(x=table5, j="β8", digits = 2)
-
-table5
-
-```
-
-{{< pagebreak >}}
-
-```{r apatb-table6}
-#| output: true
-#| echo: false
-#| apa-cap: Descriptive Statistics of RWA Scale
-#| apa-note: SD = Standard Deviation, Descriptive Statistics After Reversing Unfavorable Items
-#| ft.align: left
-
-table6 <- as.data.frame(item.fit)
-
-table6 <- table6 %>%
+table4 <- as.data.frame(item.fit)
+table4 <- table4 %>%
   select(item, S_X2, df.S_X2, RMSEA.S_X2, p.S_X2) %>% 
-  rename(Item=item) %>% 
+  rename(Item=item, χ2=S_X2, df=df.S_X2, RMSEA=RMSEA.S_X2, p=p.S_X2) %>% 
   flextable() %>% 
   theme_apa() %>% 
   line_spacing(part = "all") %>% 
   padding(padding.top = 5, padding.bottom = 5)
+table4 <- colformat_double(x=table4, j="χ2", digits = 2)
+table4 <- colformat_double(x=table4, j="df", digits = 2)
+table4 <- colformat_double(x=table4, j="RMSEA", digits = 2)
+table4 <- colformat_double(x=table4, j="p", digits = 2)
+table4
 
-table6 <- colformat_double(x=table6, j="S_X2", digits = 2)
-table6 <- colformat_double(x=table6, j="df.S_X2", digits = 2)
-table6 <- colformat_double(x=table6, j="RMSEA.S_X2", digits = 2)
-table6 <- colformat_double(x=table6, j="p.S_X2", digits = 2)
-
-
-table6
-
-```
-
-{{< pagebreak >}}
-
-```{r fig3}
-#| output: true
-#| echo: false
-#| label: apafg-fig3
-#| apa-cap: Category Probability Functions of RWA Scale
-#| apa-note: NULL
-
-tracePlot(fit, facet=T, title = "Category Probability Functions of RWA Scale") + labs(color="Response Options")
 ```
 
 {{< pagebreak >}}
@@ -531,10 +523,10 @@ tracePlot(fit, facet=T, title = "Category Probability Functions of RWA Scale") +
 #| output: true
 #| echo: false
 #| label: apafg-fig4
-#| apa-cap: Item Information Curves of the RWA Scale
+#| apa-cap: Item Probability Functions of RWA Scale
 #| apa-note: NULL
 
-itemInfoPlot(fit, facet=T, title = "Item Information Curves of the RWA Scale")
+tracePlot(fit, facet=T, title = "Item Probability Functions of RWA Scale") + labs(color="Response Options")
 ```
 
 {{< pagebreak >}}
@@ -543,10 +535,10 @@ itemInfoPlot(fit, facet=T, title = "Item Information Curves of the RWA Scale")
 #| output: true
 #| echo: false
 #| label: apafg-fig5
-#| apa-cap:  Item Information Curves of the RWA Scale Ranging from -6 to +6 Standard Deviation
+#| apa-cap: Item Information Curves of the RWA Scale
 #| apa-note: NULL
 
-itemInfoPlot(fit, facet=T, theta_range = c(-6,6), title = "Item Information Curves of the RWA Scale")#
+itemInfoPlot(fit, facet=T, title = "Item Information Curves of the RWA Scale")
 ```
 
 {{< pagebreak >}}

@@ -253,8 +253,8 @@ findCorrelation(q3, cutoff = 0.2, verbose = T) # Detecting problematic correlati
 # From the previous step, we found some problems with model misspecification. 
 # Let's take a look at the curves to closely examine the items.
 
-# Plotting Category Probability Functions (CPF)
-tracePlot(fit, facet=T, title = "Category Probability Functions of RWA Scale") + labs(color="Response Options")
+# Plotting Item Probability Functions (CPF)
+tracePlot(fit, facet=T, title = "Item Probability Functions of RWA Scale") + labs(color="Response Options")
 # All CPFs of RWA items seem to be significantly overlapping, and are peaked on the right side of the curves.
 # This implies that RWA items are more sensitive to differentiate participants with high levels of authoritarian personality.
 
