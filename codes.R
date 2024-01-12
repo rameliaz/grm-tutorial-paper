@@ -193,9 +193,9 @@ fit <- mirt(data=rwa, 1, model=model, itemtype="graded", SE=T, verbose=F) # This
 coefs <- coef(fit, IRTpars=T, simplify=T) # Storing model parameters in a data frame.
 
 # Let's take a look at the model parameters!
-print(coefs) # Yielding model parameters: item discriminations (a) and threshold (b).
+print(coefs) # Yielding model parameters: item discrimination (a) and threshold (b).
 
-# In the console, now we can see item discriminations (a), which indicates how well an item differentiates
+# In the console, now we can see item discrimination (a), which indicates how well an item differentiates
 # participant with different levels of authoritarian personality. To interpret this, we could use a guideline from 
 # Baker (2017). RWA items, in general, have a moderate to very high ability to differentiate participants with different theta levels.
 # We can see that most items have 8 item threshold each (b1-b8), and this is because we have nine response options.
