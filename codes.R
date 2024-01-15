@@ -167,12 +167,12 @@ print(efa) # Print the results.
 
 # Let's see the scree plot.
 plot(efa$values, type = "b", main = "Scree Plot", xlab = "Factor", ylab = "Eigenvalue") # Scree plot
-abline(h = 1, col = "red", lty = 2) # Add new line to factor 1.
+abline(h = 1, col = "red", lty = 2) # Add new line to eigenvalue = 1.
 
 # As we see in the plot, the Eigenvalue significantly levels off after one factor, which further substantiates our assumption.
 # However, let's run a parallel analysis, since this approach is better than running an EFA.
 
-pa <- fa.parallel(rwa, fm="minres", fa="fa") # Running a parallel analysis.
+pa <- fa.parallel(rwa, nfactors = 1, fm="minres", fa="fa") # Running a parallel analysis.
 pa$fa.values # Seeing the eigenvalues of each factor.
 
 # Again, from the plot and the Eigenvalues (12.22/0.84), we can conclude that one latent factor is sufficient, 

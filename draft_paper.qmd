@@ -100,7 +100,7 @@ Let's take a closer look at {apafg-fig1}, which shows an example of an item prob
 
 Before running an analysis, researchers need to be aware of assumption underlying a GRM model. The first key assumption is that $\Theta$ is monotonically correlated with the probability of endorsing a response category. In other words, individuals with higher levels of $\Theta$ have a higher probability of endorsing response category that represents greater intensity of the traits [@hambletonIRTModelsAnalysis2010]. For instance, people with higher tendency of sadistic personality have a greater chance of answering "*moderately agree*" or "*strongly agree*" on a sadism scale compared to those with lower levels of sadism.
 
-The second key assumption pertains to unidimensionality of $\Theta$. This implies that the item pool tested using a GRM analysis should represent only one latent trait ($\Theta$). Although it is indeed possible to account for multiple $\Theta$ in a IRT model (multidimensional IRT, see @bockFullInformationItemFactor1988, we limit the scope of our tutorial to the unidimensional GRM. To test whether an item pool represents only one $\Theta$, researchers can apply a parallel analysis [@guoAssessingDimensionalityIRT2023] or a factor analysis [@hambletonAssessingDimensionalitySet1986], before specifying their GRM models.
+The second key assumption pertains to unidimensionality of $\Theta$. This implies that the item pool tested using a GRM analysis should represent only one latent trait ($\Theta$). Although it is indeed possible to account for multiple $\Theta$ in a IRT model (multidimensional IRT, see @bockFullInformationItemFactor1988, we limit the scope of our tutorial to the unidimensional GRM. An unidimensional IRT model can still be robustly applied to multidimensional data if multiple latent traits are moderately intercorrelated or when there is a strong general factor (*g*) underlying the data [@reiseEvaluatingImpactMultidimensionality2015]. To test whether an item pool represents only one $\Theta$, researchers can apply a parallel analysis [@guoAssessingDimensionalityIRT2023] or a factor analysis [@hambletonAssessingDimensionalitySet1986], before specifying their GRM models.
 
 Relatedly, a GRM model assumes that the item pool are locally independent, as the third assumption. Local independence suggests that participants' responses to one item do not influence their response to another. It is important to note that evidence for unidimensionality does not always warrant local independence. As an eyeball example - consider a trust in science scale containing these two items: "*I trust scientists working in the natural science*" and "*most biologists are trustworthy*." While both items might measure the same latent trait (i.e., trust in science), those who trust scientists working in the natural science are very likely to also trust biologists. To inspect whether items are locally independent, researchers can examine the relationships between item responses after accounting for $\Theta$ using residual correlation analysis [@chenLocalDependenceIndexes1997].
 
@@ -108,7 +108,7 @@ Relatedly, a GRM model assumes that the item pool are locally independent, as th
 
 ## A Brief Overview of the Altemeyer's RWA Scale
 
-To illustrate the application of GRM for analyzing measurement precision of an ordered polytomous scale, we provide an example of a GRM analysis of the RWA scale data [@altemeyerRightwingAuthoritarianism1981; @altemeyerAuthoritarians2006]. @altemeyerRightwingAuthoritarianism1981 defines RWA as a personality propensity to blindly abide established authorities (i.e., authoritarian submission), to act aggressively toward individuals who are perceived to be punished by these established authorities (i.e., authoritarian aggression), and to uphold traditional values promoted by the authorities (i.e., conventionalism). Individuals with higher levels of RWA tend to view the world as a dangerous place [@duckittDualProcessMotivational2017], and thus, to ensure stability and safety, they are motivated to preserve social order by deferring to those whom they perceive as legal, social, or moral authorities; for instance, the government, religious institutions, or political or religious or military leaders [@saundersRightWingAuthoritarianismScale2017]. The RWA scale developed by @altemeyerRightwingAuthoritarianism1981 remains as one of the most important measures in the field of social and political psychology [@saundersRightWingAuthoritarianismScale2017], and has helped researchers to conceptualize the role of RWA in shaping various social psychological outcomes, such as prejudice, political behavior, and various antisocial behaviors @akramiRightWingAuthoritarianismSocial2006; [@osbornePsychologicalCausesSocietal2023; @sibleyPersonalityPoliticalOrientation2012].
+To illustrate the application of GRM for analyzing measurement precision of an ordered polytomous scale, we provide an example of a GRM analysis of the RWA scale data [@altemeyerRightwingAuthoritarianism1981; @altemeyerAuthoritarians2006]. @altemeyerRightwingAuthoritarianism1981 defines RWA as a personality propensity to blindly abide established authorities (i.e., authoritarian submission), to act aggressively toward individuals who are perceived to be punished by these established authorities (i.e., authoritarian aggression), and to uphold traditional values promoted by the authorities (i.e., conventionalism). Individuals with higher levels of RWA tend to view the world as a dangerous place [@duckittDualProcessMotivational2017], and thus, to ensure stability and safety, they are motivated to preserve social order by deferring to those whom they perceive as legal, social, or moral authorities; for instance, the government, religious institutions, or political or religious or military leaders [@saundersRightWingAuthoritarianismScale2017]. The RWA scale developed by @altemeyerRightwingAuthoritarianism1981 remains as one of the most important measures in the field of social and political psychology [@saundersRightWingAuthoritarianismScale2017], and has helped researchers to conceptualize the role of RWA in shaping various social psychological outcomes, such as prejudice, political behavior, and various antisocial behaviors [@akramiRightWingAuthoritarianismSocial2006; @osbornePsychologicalCausesSocietal2023; @sibleyPersonalityPoliticalOrientation2012].
 
 In this paper, we use the latest version of the RWA scale [@altemeyerAuthoritarians2006], which consists of 22 items that participants are asked to respond their agreement to those items on a nine-point scale, ranging from "*strongly disagree*" (-4) to "*strongly agree*" (+4). While the RWA scale consists of three sub-dimensions, i.e., submissiveness, aggression, and conventionalism, the RWA scale is (theoretically) unidimensional because [@altemeyerAuthoritarians2006] shows that the sub-dimensions are strongly intercorrelated. While some evidence shows otherwise [@duckittMultidimensionalityRightWingAuthoritarian2013], for the purpose of this article, we assume that the RWA scale is unidimensional.
 
@@ -118,60 +118,70 @@ To maximize the reproducibility of our illustrative example, we wrote the articl
 
 ## Step 1: Preparation
 
+Before running the analysis, we need to install the necessary R packages, which are, *mirt* [@chalmersMirtMultidimensionalItem2023a; @chalmersMirtMultidimensionalItem2012], *psych* [@revellePsychProceduresPsychological2023a], *ggmirt* [@masurGgmirt2023], *tidyverse* [@wickhamWelcomeTidyverse2019], *caret* [@kuhnCaretClassificationRegression2024], and *devtools* [@wickhamDevtoolsToolsMake2022], with these following commands: 
+
 ```{r}
 install.packages("tidyverse", "psych", "devtools", "mirt", "caret", dependencies=TRUE)
 devtools::install_github("masurp/ggmirt") # remote installation through GitHub repository
 ```
 
-Blabla
+The above command also automatically requests to install dependency packages. Note that we install `ggmirt` directly from its GitHub repository because `ggmirt` is not yet available in the Comprehensive R Archive Network (CRAN). Next, we should activate the R packages by typing a command as follows:
 
 ```{r}
-library(ggmirt); library(tidyverse); library(psych); library(mirt); library(caret)
+library(mirt); library(ggmirt); library(psych); library(tidyverse); library(caret)
 ```
 
-Blabla
+Now after the packages are activated, we need to import the dataset to our R environment. The dataset (`data.csv`) and codebook (`codebook.txt`) are available in `data` folder in our repository. Readers can download them from our repository and then simply import the dataset with this following command:
 
 ```{r}
 ds <- read.csv("data/data.csv")
 ```
 
-Blabla
+However, since the dataset is openly accessible in the Open Psychometrics webpage, readers can also directly import the dataset from the Open Psychometrics webpage to their R environment. For interested readers, we show how to do this in detail in our annotated R script file.
+
+Next, it is important to examine the structure of the data frame (`ds`) to get a glimpse of its structure. By typing `str()` command, readers can examine the variables' name, number of cases, types of variables (integer or character), and the values of each variable. Then readers can match the information provided in their R console to the codebook. 
 
 ```{r}
 str(ds)
 ```
 
-Blabla
+According the information provided in the codebook, the responses to the RWA scale are denoted in `Q1` to `Q22`, each represents score of each item of the RWA scale. Readers can also see the information of `Q1` to `Q22` variables in their R console: these variables are integer and have values ranging from 1 to 9. In the codebook, there is no information regarding what these values (i.e., 1-9) mean. However, we could reasonably assume that participants who chose "*strongly disagree*" (-4) were scored `1`, and those who opted for "*strongly agree*" (+4) were scored `9`. 
+
+Please note that we are only interested in the responses of the RWA scale, so we should subset the dataset to contain only the variables we are interested in, and then, examine the structure again. To this end, readers can type these commands:
 
 ```{r}
 rwa <- subset(ds, select = Q1:Q22)
 str(rwa)
 ```
 
-Blabla
+Here, we have a new data frame namely `rwa`, which contains only the responses to the RWA scale (`Q1:Q22`). In the data frame `rwa`, we have 22 variables with 9,881 participants. Before proceeding to the analysis stage, we recommend readers to inspect descriptive statistics, which we explain the procedure in the next sub-section.
 
 ## Step 2: Inspecting Key Descriptive Statistics
+
+To efficiently examine descriptive statistics, readers can make use of `describe()` function from *psych* package [@revellePsychProceduresPsychological2023] by typing a simple command:
 
 ```{r}
 psych::describe(rwa)
 ```
 
-As we see in {apatb-table2}, Kok ada nilai 0-nya? padahal kan skor minimalnya 1. Coba kita hitung frekuensi nilai 0 di tiap item.
+This command summarizes key descriptive statistics of a data frame, and the summary is provided in {apatb-table2}. As we see in {apatb-table2}, all variables have minimum value of `0`, while the minimum score should be `1`. Again, there is no information provided in the codebook regarding what `0` actually represents. Therefore, before deciding what we should do next, it is better to find out how many `0` we have in the data frame. To this end, we can calculate the percentage of `0` in each item by running these commands:
 
 ```{r}
-zero <- colSums(rwa == 0) / nrow(rwa) * 100 # Computing the frequency of "0" in each column.
-print(zero) # The proportion of "0" for each item.
+zero <- colSums(rwa == 0) / nrow(rwa) * 100 # Computing the percentage of "0" in each column.
+print(zero) # Examining the proportion of "0" for each item.
 ```
 
-Kita anggap nilai 0 adalah NA dan kita delete semua case dengan nilai NA
+After executing these commands, readers can view the percentage of `0` in each items in their R console, which overall are very small, ranging from 0.09% to 0.32% of the total cases. Since the percentages are very small, it is very likely that `0` is a code for a missing value. It is important to note that *mirt* package uses the Expected-Maximization (EM) algorithm to estimate model parameters, and the EM algorithm can handle missing values [@chalmersMirtMultidimensionalItem2012]. If we decide to eliminate cases with missing values, we still have a sizable number of cases, nonetheless. Therefore, to simplify our analysis, we only keep cases with complete responses by executing these commands:
 
 ```{r}
 rwa <- rwa %>%
-  mutate_all(~na_if(., 0)) %>%  # Replacing 0 with NA in all columns.
-  drop_na()  # Removing cases with any NA values.
+  mutate_all(~na_if(., 0)) %>%  # Recoding "0" with "NA" in all columns.
+  drop_na()  # Removing cases with any "NA" values.
 ```
 
-Kalau lihat di {apatb-table2}, meannya kok beda2? oh iya karena ada unfavorable items. Ayo kita reverse score dulu ya.
+If readers prefer to keep cases with missing values, especially when the sample size is low, readers can exclude `drop_na()` command.
+
+Interestingly, if we look {apatb-table2} again, mean score of the items seem to differ drastically. Some items have high mean scores, ranging from 6 to 7, but some of those are comparatively low. The RWA scale indeed has some unfavorable items but, again, there is no information in the codebook whether these unfavorable items have been reversely coded. However, if we look closely at ten items with high mean ($\bar{x}$ > 6), these are the items that are supposed to be unfavorable. Therefore, we can reasonably assume that unfavorable items have not been reversed in the original dataset, and we should do so by running these commands:
 
 ```{r}
 unfav <- c("Q4","Q6","Q8","Q9","Q11","Q13","Q15","Q18","Q20","Q21") # Now we create a vector defining which items will be coded reversely.
@@ -179,7 +189,11 @@ rwa <- rwa %>%
   mutate(across(all_of(unfav), ~ 10 - .))# We simply subtract the scores from 9 (the maximum) + 1 to reverse code the unfavorable items.
 ```
 
+First, we define a vector namely `unfav` to identify which items should be reversed, and then we use `mutate()` function to reverse the score. This is simply done by subtracting the values of the unfavorable items from the maximum score plus one. We can examine descriptive statistics of our modified data frame by running `describe()` function again, and as readers can see in {apatb-table3}, now items' mean do not drastically vary and have `1` as its minimum value. 
+
 ## Step 3: Examining Dimensionality
+
+Next, we show the readers the ways of testing a key assumption of an IRT model, namely unidimensionality. To test the number of latent factors of an item pool, @deayalaAssessmentDimensionalityUse1991 suggests three alternatives, which are multidimensional scaling (MDS), EFA, and CFA. In this tutorial, we decide to use EFA, and *psych* package provides a very efficient way to do this is by calling this simple command:
 
 ```{r}
 #| eval: false
@@ -187,39 +201,52 @@ rwa <- rwa %>%
 irt.fa(rwa, nfactors = 1, fm = "minres")
 ```
 
-lalalala
+`irt.fa` function is to run an EFA with a polychoric correlation matrix as an input, not a Pearson's correlation matrix, because our data is ordinal. The option `fm = "minres"` implies that we choose minimum residual as a factoring method due to its effectiveness in handling non-normally distributed data [@harmanFactorAnalysisMinimizing1966]. Alternatively, readers can also run a parallel analysis with a polychoric correlation matrix by calling this following command:
 
 ```{r}
 #| eval: false
 
-fa.parallel(rwa, nfactors = 1, fm="minres", fa="fa", cor = "poly")
+fa.parallel(rwa, nfactors = 1, fm = "minres", fa = "fa", cor = "poly")
 ```
 
-lalalalal
+A parallel analysis compares the eigenvalues from the data with those yielded from a randomly generated dataset with the same sample size in order to determine the number of factors one should retain in EFA [@guoAssessingDimensionalityIRT2023]. The codes indicate that we tell R to run a parallel analysis on the data frame `rwa`, with one factor. The option `fa="fa"` implies that we want to show the eigenvalues for a EFA, while `cor = "poly"` means that we use a polychoric correlation matrix as an input. 
+
+The call to both commands above produces this following error: `Error in polychoric(x): You have more than8 categories for your items, polychoric is probably not needed`. Since we have more than eight response categories, we should instead run an EFA with a Pearson's correlation matrix as an input. Therefore, we first need to create a Pearson's correlation matrix from our data frame, and then, run a EFA by calling these following commands: 
 
 ```{r}
-cor <- cor(rwa,method="pearson") # First, creating a (pearson) correlation matrix.
-efa <- fa(rwa, nfactors=1, fm="minres") # Now, running exploratory factor analysis. 
+cor <- cor(rwa, method = "pearson") # First, creating a Pearson's correlation matrix.
+efa <- fa(rwa, nfactors = 1, fm = "minres") # Now, running EFA.
 print(efa) # Print the results.
 ```
 
-Scree plot
-
-Now lets do parallel analysis
+After calling the commands, readers can find `Proportion Var` in the output, which reflects the amount of variance explained by a latent factor. The variance proportion of our EFA model is 0.56, which means that 56% of total variance is explained by a latent factor. Since the latent factor can account for more than 50% of variance, we can reasonably assume that the latent factor underlying our data is indeed unidimensional. To better visualize the eigenvalues of the EFA, we can draw a scree plot using these following commands:
 
 ```{r}
-pa <- fa.parallel(rwa, fm="minres", fa="fa")
+#| eval: false
+
+plot(efa$values, type = "b", main = "Scree Plot", xlab = "Factor", ylab = "Eigenvalue") # Scree plot
+abline(h = 1, col = "red", lty = 2) # Add new line to eigenvalue = 1.
 ```
 
-lalalala
+The first line of code is a function to plot the Eigenvalues (`efa$values`, x-axis) given the number of latent factors (y-axis). The option `type = "b"` implies that we ask R to display the Eigenvalues exact points and a line connecting these points along the number of factors. The second line of code aims to display a horizontal red line (i.e., a reference line) to see which factors have eigenvalues greater than one, which is a common criterion for factor retention. {apafg-fig2} shows that there is a clear break or an "elbow" that displays the location where the Eigenvalues start to level off. This implies that factors beyond 1 may not be meaningful and could just represent noise. Therefore, the scree plot strengthens our assumption that the item pool is, indeed, unidimensional.
+
+To support unidimensionality assumption, we can also run a parallel analysis by running this following command:
+
+```{r}
+pa <- fa.parallel(rwa, nfactors = 1, fm="minres", fa="fa")
+```
+
+Readers may find a plot similar to {apafg-fig3} should appear right after executing this code, as well as a message, which says: `Parallel analysis suggests that the number of factors =  6  and the number of components =  NA`. This means that the parallel analysis suggests that there are six factors underlying our item pool, not one. However, according to {apafg-fig3}, we can see clearly that the Eigenvalues from our actual data fall steeply after the first factor. To paint a clearer picture, we can examine the Eigenvalues of each latent factor estimated by the parallel analysis by running this following command:
 
 ```{r}
 pa$fa.values
 ```
 
-Eigenvalues `12.225/0.843`
+The output shows that the Eigenvalues for the first factor is much larger than the its adjacent factor (`12.225/0.843`), strengthening the evidence for unidimensionality. 
 
 ## Step 4: Model Estimation, Parameters, and Fit Statistics
+
+
 
 ```{r}
 model <- 'rwa = 1-22'
@@ -489,7 +516,7 @@ sum <- summary(fit)
 #| output: true
 #| echo: false
 #| apa-cap: Item Parameters
-#| apa-note: λ = Standardized Factor Loadings, h2 = Commonality, α = Discrimination, β1.4 = Response specific difficulty parameters (item threshold).
+#| apa-note: λ = Standardized Factor Loadings, h2 = Commonality, a = Discrimination, b1-b8 = Response specific threshold parameters.
 #| ft.align: left
 #| column: page
 
@@ -500,20 +527,20 @@ table3 <- cbind(table3, load, h2)
 table3 <- table3 %>% 
   rownames_to_column(var="Item") %>% 
   select(Item, a, b1, b2, b3, b4, b5, b6, b7, b8, rwa, h2) %>% 
-  rename(α=a, β1=b1, β2=b2, β3=b3, β4=b4, β5=b5, β6=b6, β7=b7, β8=b8, λ=rwa) %>% 
+  rename(λ=rwa) %>% 
   flextable() %>% 
   theme_apa() %>% 
   line_spacing(part = "all") %>% 
   padding(padding.top = 5, padding.bottom = 5)
-table3 <- colformat_double(x=table3, j="α", digits = 2)
-table3 <- colformat_double(x=table3, j="β1", digits = 2)
-table3 <- colformat_double(x=table3, j="β2", digits = 2)
-table3 <- colformat_double(x=table3, j="β3", digits = 2)
-table3 <- colformat_double(x=table3, j="β4", digits = 2)
-table3 <- colformat_double(x=table3, j="β5", digits = 2)
-table3 <- colformat_double(x=table3, j="β6", digits = 2)
-table3 <- colformat_double(x=table3, j="β7", digits = 2)
-table3 <- colformat_double(x=table3, j="β8", digits = 2)
+table3 <- colformat_double(x=table3, j="a", digits = 2)
+table3 <- colformat_double(x=table3, j="b1", digits = 2)
+table3 <- colformat_double(x=table3, j="b2", digits = 2)
+table3 <- colformat_double(x=table3, j="b3", digits = 2)
+table3 <- colformat_double(x=table3, j="b4", digits = 2)
+table3 <- colformat_double(x=table3, j="b5", digits = 2)
+table3 <- colformat_double(x=table3, j="b6", digits = 2)
+table3 <- colformat_double(x=table3, j="b7", digits = 2)
+table3 <- colformat_double(x=table3, j="b8", digits = 2)
 table3
 
 ```
@@ -524,7 +551,7 @@ table3
 #| output: true
 #| echo: false
 #| apa-cap: Item Fit Statistics
-#| apa-note: Scaled χ2 Statistics. RMSEA = root mean square error of approximation, CFI = comparative fit index, TLI = Tucker-Lewis index, SRMR = Standardized Root Mean Square Residual.
+#| apa-note: Scaled χ2 Statistics. RMSEA = Root Mean Square Error of Approximation, CFI = Comparative Fit Index, TLI = Tucker-Lewis Index, SRMR = Standardized Root Mean Square Residual.
 #| ft.align: left
 
 table4 <- as.data.frame(item.fit)
