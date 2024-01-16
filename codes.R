@@ -15,8 +15,16 @@
 # First of all, we should install the packages we need for the analysis. If you already have these packages  
 # already installed in your device, you can safely skip this step.
 
-# install.packages("tidyverse", "psych", "devtools", "mirt", "caret", dependencies=TRUE) 
+# install.packages("tidyverse", # for data wrangling
+# "psych", # for descriptive statistics and unidimensionality test
+# "devtools", # for installing R package that is not available on CRAN
+# "mirt", # for conducting the main GRM analysis
+# "caret", # for helping us detecting large residuals correlation (local independence test)
+# dependencies=TRUE)
+
 ## INFO: Remove the hashtag before install.package() to start installing packages (only if you have not had them installed) ##
+
+devtools::install_github("masurp/ggmirt") # remote ggmirt installation through GitHub repository
 
 # Package `ggmirt` is not available in CRAN, so we have to do a remote installation by downloading the package from its Github repository.
 
@@ -88,8 +96,8 @@ psych::describe(rwa)
 
 # Let's count how many "0" we have in our data.
 
-zero <- colSums(rwa == 0) / nrow(rwa) * 100 # Computing the frequency of "0" in each column.
-print(zero) # The proportion of "0" for each item.
+zero <- colSums(rwa == 0) / nrow(rwa) * 100 # Computing the percentage of "0" in each column.
+print(zero) # Showing the percentage of "0" for each item.
 rm(zero) # Removing the unused vector
 
 # We have a few cases with "0" in all items. 
@@ -200,11 +208,11 @@ print(coefs) # Yielding model parameters: item discrimination (a) and threshold 
 # Baker (2017). RWA items, in general, have a moderate to very high ability to differentiate participants with different theta levels.
 # We can see that most items have 8 item threshold each (b1-b8), and this is because we have nine response options.
 
-summary(fit) # Yielding factor loadings and communality (h2) from mirt model.
+summary(fit) # Displaying factor loadings and commonality.
 
 # Before estimating a graded response model, mirt ran an EFA, and now as we can see in the console,
 # we are looking at the EFA results. The results are slightly different from our previous EFA analysis,
-# because mirt EFA using a quasi polychoric correlation matrix, while the one we ran earlier used a pearson 
+# because mirt runs EFA using a quasi polychoric correlation matrix, while the one we ran earlier used a pearson 
 # correlation matrix. However, most importantly, we see that all items are significantly loaded to one factor, 
 # and the factor now substantially accounts for 65.1% of the variance in the data, which strengthens our assumption
 # that the RWA scale is unidimensional.
