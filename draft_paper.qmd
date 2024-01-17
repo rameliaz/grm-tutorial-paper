@@ -118,7 +118,7 @@ To maximize the reproducibility of our illustrative example, we wrote the articl
 
 ## Step 1: Data Preparation
 
-Before running the analysis, we need to install the necessary R packages, which are, *mirt* [@chalmersMirtMultidimensionalItem2023a; @chalmersMirtMultidimensionalItem2012], *psych* [@revellePsychProceduresPsychological2023a], *ggmirt* [@masurGgmirt2023], *tidyverse* [@wickhamWelcomeTidyverse2019], *caret* [@kuhnCaretClassificationRegression2024], and *devtools* [@wickhamDevtoolsToolsMake2022], with these following commands: 
+Before running the analysis, we need to install the necessary R packages, which are, *mirt* [@chalmersMirtMultidimensionalItem2023a; @chalmersMirtMultidimensionalItem2012], *psych* [@revellePsychProceduresPsychological2023], *ggmirt* [@masurGgmirt2023], *tidyverse* [@wickhamWelcomeTidyverse2019], *caret* [@kuhnCaretClassificationRegression2024], and *devtools* [@wickhamDevtoolsToolsMake2022], with these following commands: 
 
 ```{r}
 install.packages("tidyverse", # for data wrangling
@@ -431,9 +431,8 @@ e_rel <- empirical_rxx(theta_se)
 e_rel = round(e_rel, digits=3)
 ```
 
-The `fscores()` function is used to compute the estimated $\theta$ value for each participant predicted by the `fit` model. The `full.scores.SE` is set to `TRUE` because the package uses the $\theta$ value and standard error of each participant (*SE*~$\theta$~) to compute the empirical reliability. We store the estimated $\theta$ and its *SE*~$\theta$~ in a new data frame, namely `theta_se`, and then run `empirical_rxx()` function to calculate empirical reliability. The output of these codes is `r e_rel`, which is very close to marginal reliability. However, it is very important to note that while marginal and empirical reliability aim to quantify the scale's overall reliability, they base the calculations on different assumptions. Marginal reliability assumes that $\theta$ is normally distributed, and empirical reliability uses $\theta$ distribution predicted by the model, which still contains measurement errors but more realistic.
-
-It is very important to note that our model has a poor fit, as we showed in step 4. In practice, we recommend that readers address the model fitting issues before interpreting reliability or drawing substantive conclusions based on these estimates. 
+The `fscores()` function is used to compute the estimated $\theta$ value for each participant predicted by the `fit` model. The `full.scores.SE` is set to `TRUE` because the package uses the $\theta$ value and standard error of each participant (*SE*~$\theta$~) to compute the empirical reliability. We store the estimated $\theta$ and its *SE*~$\theta$~ in a new data frame, namely `theta_se`, and then run `empirical_rxx()` function to calculate empirical reliability. The output of these codes is `r e_rel`, which is very close to marginal reliability we estimated before. 
+Notably, while marginal and empirical reliability aim to quantify the overall reliability of the scale, they base the calculations on different assumptions. Marginal reliability assumes that $\theta$ is normally distributed, and empirical reliability uses the $\theta$ distribution predicted by the model, which still contains measurement error but is more realistic. Note that our model has a poor fit, perhaps due to local dependence, as we showed in steps 4 and 5. In practice, we recommend that readers address model fitting issues before interpreting reliability or drawing substantive conclusions based on these estimates. 
 
 To paint a more comprehensive picture, we can compare IRT-based reliability calculations with unweighted sum-score based reliability, such as Cronbach's $\alpha$ and McDonald's $\omega$. To do this, we can use `omega()` function provided by *psych* package [@revellePsychProceduresPsychological2023], which can be done by running this command:
 
@@ -450,7 +449,7 @@ oh <- om$omega_h
 oh = round(oh, digits = 3)
 ```
 
-The output of `omega()` function includes many information but we only focus on Cronbach's $\alpha$ and McDonald's $\omega$~h~. Both Cronbach's $\alpha$ ($\alpha$ = `r alpha`) and McDonald's $\omega$ ($\omega$~h~ = `r oh`) shows that the RWA scale is overall internally consistent. 
+The output of `omega()` function includes many information but we only need to focus on Cronbach's $\alpha$ and McDonald's $\omega$~h~. Both Cronbach's $\alpha$ ($\alpha$ = `r alpha`) and McDonald's $\omega$ ($\omega$~h~ = `r oh`) shows that the RWA scale is overall internally consistent.  
 
 # Conclusions
 
