@@ -166,7 +166,7 @@ Here, we have a new data frame namely `rwa`, which contains only the responses t
 To efficiently examine descriptive statistics, readers can make use of `describe()` function from *psych* package [@revellePsychProceduresPsychological2023] by typing a simple command:
 
 ```{r}
-psych::describe(rwa)
+describe(rwa)
 ```
 
 This command summarizes key descriptive statistics of a data frame, and the summary is provided in {apatb-table2}. As we see in {apatb-table2}, all variables have minimum value of `0`, while the minimum score should be `1`. Again, there is no information provided in the codebook regarding what `0` actually represents. Therefore, before deciding what we should do next, it is better to find out how many `0` we have in the data frame. To this end, we can calculate the percentage of `0` in each item by running these commands:
@@ -194,11 +194,11 @@ rwa <- rwa %>%
   mutate(across(all_of(unfav), ~ 10 - .))# We simply subtract the scores from 9 (the maximum) + 1 to reverse code the unfavorable items.
 ```
 
-First, we define a vector namely `unfav` to identify which items should be reversed, and then we use `mutate()` function to reverse the score. This is simply done by subtracting the values of the unfavorable items from the maximum score plus one. We can examine descriptive statistics of our modified data frame by running `describe()` function again, and as readers can see in {apatb-table3}, now items' mean do not drastically vary and have `1` as its minimum value. 
+First, we define a vector namely `unfav` to identify which items should be reversed, and then we use `mutate()` function to reverse the score. This is simply done by subtracting the values of the unfavorable items from the maximum score plus one. We can examine descriptive statistics of our modified data frame by running `describe()` function again, and as readers can see in {apatb-table3}, now mean score across items do not drastically vary and have `1` as its minimum value. 
 
 ## Step 3: Examining Dimensionality
 
-Next, we show the readers the ways of testing a key assumption of an IRT model, namely unidimensionality. To test the number of latent factors of an item pool, @deayalaAssessmentDimensionalityUse1991 suggests three alternatives, which are multidimensional scaling (MDS), EFA, and CFA. In this tutorial, we decide to use EFA, and *psych* package provides a very efficient way to do this is by calling this simple command:
+Next, we show the readers the ways of testing unidimensionality. To test the number of latent factors of an item pool, @deayalaAssessmentDimensionalityUse1991 suggests three alternatives, which are multidimensional scaling (MDS), EFA, and CFA. In this tutorial, we demonstrate the use of EFA, and *psych* package provides a very efficient way to do this is by calling this command:
 
 ```{r}
 #| eval: false
@@ -238,7 +238,7 @@ The first line of code is a function to plot the Eigenvalues (`efa$values`, x-ax
 To scrutinize unidimensionality assumption, we can also run a parallel analysis by running this following command:
 
 ```{r}
-pa <- fa.parallel(rwa, nfactors = 1, fm="minres", fa="fa")
+pa <- fa.parallel(rwa, nfactors = 1, fm = "minres", fa = "fa")
 ```
 
 Readers should find a plot similar to {apafg-fig3} appear right after executing this code as well as a message, which says: `Parallel analysis suggests that the number of factors =  6  and the number of components =  NA`. This means that the parallel analysis suggests that there are six factors underlying our item pool, not one. However, according to {apafg-fig3}, we can see clearly that the Eigenvalues from our actual data fall steeply after the first factor. To paint a clearer picture, we can examine the Eigenvalues of each latent factor estimated by the parallel analysis by running this following command:
@@ -247,7 +247,7 @@ Readers should find a plot similar to {apafg-fig3} appear right after executing 
 pa$fa.values
 ```
 
-The output shows that the Eigenvalues for the first factor is much larger than the its adjacent factor (`12.225/0.843`), strengthening the evidence for unidimensionality. 
+The output shows that the Eigenvalues for the first factor is much larger than the its adjacent factor (`12.225/0.843`), further supporting for the evidence for unidimensionality. 
 
 ## Step 4: Model Estimation, Parameters, and Fit Statistics
 
@@ -276,7 +276,7 @@ The error message (c) and (d) are easier to solve because both indicate the erro
 Next, we can ask the package to calculate item discrimination and thresholds by calling these functions below:
 
 ```{r}
-coefs <- coef(fit, IRTpars=TRUE, simplify=TRUE) # Saving model parameters (item discrimination (a) and threshold (b)) in a data frame.
+coefs <- coef(fit, IRTpars = TRUE, simplify = TRUE) # Saving model parameters (item discrimination (a) and threshold (b)) in a data frame.
 print(coefs) # Calling the data frame.
 summary(fit) # Displaying factor loadings and commonality.
 ```
@@ -290,7 +290,7 @@ The third line of code is a function to calculate a factor loading ($\lambda$) a
 Next, we can estimate the model goodness-of-fit (GOF) statistics (*M*~2~) by calling this command below:
 
 ```{r}
-M2(fit, type="C2")
+M2(fit, type = "C2")
 ```
 ```{r}
 #| include: false
@@ -322,21 +322,30 @@ item.fit <- itemfit(fit) # Estimating item fit statistics and saving them in a d
 print(item.fit) # Calling the data frame.
 ```
 
-The output of this function is provided in {apatb-table5}, which shows fit statistics for an individual item. All items have very good (low) *RMSEA* values but normally, we want the *p* values of the scaled $\chi$^2^ to be nonsignificant, implying there is no discrepancy between the model and data. In {apatb-table5}, only three items here are nonsignificant (Q2, Q4, and Q12), which strengthens our suspicion that the RWA items might not be locally independent. 
+The output of this function is provided in {apatb-table5}, which shows fit statistics for an individual item. All items have very good (low) *RMSEA* values but normally, we want the *p* values of the scaled $\chi$^2^ to be nonsignificant, implying there is no discrepancy between the observed response pattern with what the model predicts. In {apatb-table5}, only three items here are nonsignificant (Q2, Q4, and Q12), which strengthens our suspicion that the RWA items might not be locally independent. 
 
 ## Step 5: Model Residuals
 
+To ensure that the items are locally independent, *mirt* offers several alternatives to examine the behavior of model residuals. First, we demonstrate how to run Local Dependency (LD) $\chi$^2^ statistics [@chenLocalDependenceIndexes1997], which looks at the covariance between item pairs after accounting for $\theta$. To that end, readers can run two lines of codes as follows:
+
 ```{r}
-ld <- residuals(fit, type = "LD") # Running local dependency statistics
-up <- which(upper.tri(ld), arr.ind = T) # Extracting values only on the upper side of the diagonal.
-lar <- up[ld[up] > 0.2 | ld[up] < -0.2, ] # Defining unusually large residuals (>0.2).
+ld <- residuals(fit, type = "LD") # Running local dependency (LD) statistics.
+up <- which(upper.tri(ld), arr.ind = TRUE) # Creating a new matrix containing values only on the upper side of the diagonal (correlations).
 ```
 
-lhalalala
+The first line of code aims to extract residuals of `fit` model and store them as a matrix, namely `ld`. The `type` option is set to `"LD"` because we ask the package to calculate LD statistics of the `fit` model. After running the first line, readers may view a matrix containing residual covariance (in the lower diagonal) and correlations (in the upper diagonal). Correlations are more interpretable, so we focus on the upper side of the diagonal. Therefore, the second line of code is to create a new matrix containing only correlation values in the upper diagonal.
+
+We are only interested in large correlations between a pair of items because they indicate that responses to one item depend on responses to another item beyond what is explained by $\theta$. It is important to note that there is no consensus on a rule of thumb for the cutoff value of residual correlations because LD statistics are contingent to the parameters of a specific dataset [@christensenCriticalValuesYen2017]. For the purpose of this tutorial, we set |0.2| as an paired correlation value that we want to look closely. To do so, we create a vector to define the value of residual correlations that we are interested in:
 
 ```{r}
 #| eval: false
+lar <- up[ld[up] > 0.2 | ld[up] < -0.2, ] # A vector defining unusually large residuals ( > |0.2|).
+```
 
+We can then use the new vector `lar` to ask R to tell us the item pairs with residuals correlations above |0.2| by running this function:
+
+```{r}
+#| eval: false
 for (i in 1:nrow(lar)) {
   row <- lar[i, 1]
   col <- lar[i, 2]
@@ -345,32 +354,47 @@ for (i in 1:nrow(lar)) {
 } # Now we detect the problematic pairs.
 ```
 
-lhalalala
+After running the function above, readers may encounter an error message: `Error in lar[i, 1] : subscript out of bounds`. This message indicates that R does not detect any residual correlation above |0.2|. To paint a clearer picture, we may need to use another way to examine model residuals. In the next part, we demonstrate the use of Yen's *Q*~3~ statistics [@yenEffectsLocalItem1984], which is considered more powerful for detecting underlying local dependency [@chenLocalDependenceIndexes1997]. To run Yen's *Q*~3~, readers can type and run this command:
 
 ```{r}
-q3 <- residuals(fit, type = "Q3") # Running Yen's Q3 statistics
-findCorrelation(q3, cutoff = 0.2, verbose = T) # Detecting problematic correlation pairs.
+q3 <- residuals(fit, type = "Q3") # Running Yen's Q3 statistics.
 ```
+
+This code asks R to run `residuals()` function using `"Q3"` as the `type`, and then, keep the value as a new matrix, namely `q3`. Again, we are only interested in item pairwise correlations above |0.2|, and to help us flag problematic pairs, we can make use of `findCorrelation()` function from *caret* package [@kuhnCaretClassificationRegression2024] as follows:
+
+```{r}
+findCorrelation(q3, cutoff = 0.2, verbose = T) # Flagging problematic item pairwise correlations.
+```
+
+After running the code, readers may see in their R console that residual correlations between item Q3, Q4, Q5, Q7, Q11, Q13, Q14, Q18, Q19, and Q21 are above |0.2|. Interestingly, all of those items, except for Q4, have nonsignificant *S*-$\chi$^2^ statistics (see {apatb-table5}) as well, which tells us that we have to look at these items closely and then decide whether these items have shared characteristics beyond what is explained by the model.
 
 ## Step 6: IRT Plots
 
-Now spit out the
+*mirt* offers features to visualize model parameters but the options for customizing these plots are rather limited. *ggmirt* package [@masurGgmirt2023] fills this gap by combining *mirt* and *ggplot2* functions. In this tutorial, we demonstrate the use of *ggmirt* to visualize Item Probability Function (IPF), Item Information Function (IIF), Test Information Function (TIF), and conditional probability plot.
+
+To visualize IPF, readers can type and run this function:
 
 ```{r}
-tracePlot(fit, facet=T, title = "Category Probability Functions of RWA Scale") + labs(color="Response Options")
+tracePlot(fit, title = "Item Probability Functions of RWA Scale") + labs(color="Response Categories")
 ```
 
-lhalalala
+The `labs(color)` function is to assign different colors to each curve representing a response category. The output of this function is {apafg-fig4}. In {apafg-fig4}, we see that as $\theta$ increases, respondents are more likely to choose higher response categories. The gradual transition from one response option to the next across the spectrum of $\theta$ values indicates that the items are capturing incremental increases in the RWA level. However, all IPFs of RWA items seem to be significantly overlapping and tend to peak on a $\theta$ value close to or higher than the mean. This implies that RWA items are more sensitive to differentiate participants with high levels of RWA.
+
+To evaluate the performance of each item in measuring RWA trait, we can visualize the amount of information explained by each item with this simple line of code:
 
 ```{r}
-itemInfoPlot(fit, facet=T, title = "Item Information Curves of the RWA Scale")
+itemInfoPlot(fit, facet = TRUE, title = "Item Information Functions of the RWA Scale")
 ```
 
-lhalalala
+The `facet` option is set to `TRUE` so that R displays IIF for each item. The output for this function is {apafg-fig5}, where the x-axis represents the range of $\theta$, and the y-axis indicates the amount of information provided by each item. Peaks that are higher and narrower indicate items that are very informative for specific levels of $\theta$. In our case, most items provide the highest amount of information near the center to the right side of the $\theta$ distribution, indicating they are most useful for individuals with an average to high level of RWA.
+
+It is also possible to evaluate the overall performance of the RWA scale by plotting a TIF, which can be done by running this following code: 
 
 ```{r}
-testInfoPlot(fit, title="Test Information Curve of the RWA Scale")
+testInfoPlot(fit, title = "Test Information Function of the RWA Scale")
 ```
+
+The output of this code is {apafg-fig6}, and according to this, the RWA scale as a whole is informative for measuring individuals with a wide range of RWA levels, i.e., between -2*SD* to +4*SD*. 
 
 ## Step 7: Computing Reliability
 
@@ -381,10 +405,10 @@ m_rel <- marginal_rxx(fit)
 lhalalala
 
 ```{r}
-conRelPlot(fit, title="Reliability of the RWA Scale Given to the θ Level")
+conRelPlot(fit, title = "Reliability of the RWA Scale Given to the θ Level")
 ```
 
-lalalala
+{apafg-fig7}
 
 ```{r}
 theta_se <- fscores(fit, full.scores.SE = T) # Extracting the estimated theta score of each participant.

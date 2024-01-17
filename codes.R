@@ -90,7 +90,7 @@ str(rwa)
 # This part is fairly straightforward. Before performing analysis, it is very important to explore
 # key descriptive statistics of the data. We are using a neat function in `psych` package: (`describe()`)
 
-psych::describe(rwa)
+describe(rwa)
 # Why there are "0" values in all columns (see column "min")?
 # The items are not supposed to have "0" value because the responses are ranging from 1-9.
 
@@ -238,9 +238,9 @@ itemfit(fit) # Yielding item fit statistics.
 # In this tutorial, we will introduce two ways to examine residuals. First, we will inspect a local dependence 
 # matrix derived from the X2 statistics (Chen & Thissen, 1997), and second, we will look at Yen's Q3 statistics. 
 
-ld <- residuals(fit, type = "LD") # Running local dependency statistics
-up <- which(upper.tri(ld), arr.ind = T) # Extracting values only on the upper side of the diagonal.
-lar <- up[ld[up] > 0.2 | ld[up] < -0.2, ] # Defining unusually large residuals (>0.2).
+ld <- residuals(fit, type = "LD") # Running local dependency (LD) statistics.
+up <- which(upper.tri(ld), arr.ind = T) # Creating a new matrix containing values only on the upper side of the diagonal (correlations).
+lar <- up[ld[up] > 0.2 | ld[up] < -0.2, ] # A vector defining unusually large residuals ( > |0.2|).
 
 for (i in 1:nrow(lar)) {
   row <- lar[i, 1]
@@ -253,7 +253,7 @@ for (i in 1:nrow(lar)) {
 
 # Let's see how Yen's Q3 statistics look like.
 q3 <- residuals(fit, type = "Q3") # Running Yen's Q3 statistics
-findCorrelation(q3, cutoff = 0.2, verbose = T) # Detecting problematic correlation pairs.
+findCorrelation(q3, cutoff = 0.2, verbose = T) # Flagging problematic item pairwise correlations.
 # As we see here in the console that items Q3, Q4, Q5, Q7, Q11, Q13, Q14, Q18, Q19, and Q21 are problematic.
 
 ## Step 6: Plots (item characteristics curve, item information curve, and test information curve) ##   ------
@@ -262,16 +262,16 @@ findCorrelation(q3, cutoff = 0.2, verbose = T) # Detecting problematic correlati
 # Let's take a look at the curves to closely examine the items.
 
 # Plotting Item Probability Functions (CPF)
-tracePlot(fit, facet=T, title = "Item Probability Functions of RWA Scale") + labs(color="Response Options")
+tracePlot(fit, title = "Item Probability Functions of RWA Scale") + labs(color="Response Categories")
 # All CPFs of RWA items seem to be significantly overlapping, and are peaked on the right side of the curves.
 # This implies that RWA items are more sensitive to differentiate participants with high levels of authoritarian personality.
 
 # Plotting Item Information Curve (IIC).
-itemInfoPlot(fit, facet=T, title = "Item Information Curves of the RWA Scale")
+itemInfoPlot(fit, facet = TRUE, title = "Item Information Functions of the RWA Scale")
 # Some items (Q1, Q5, Q6, Q8, Q9, Q11) seem to yield the least information compared to other items.
 
 # Plotting Test Information Curve.
-testInfoPlot(fit, title="Test Information Curve of the RWA Scale")
+testInfoPlot(fit, title="Test Information Function of the RWA Scale")
 # Apparently, the RWA scale is informative to measure participants with theta levels between -2SD to +4SD.
 
 ## Step 7: Computing reliability ##   ------
@@ -295,9 +295,9 @@ marginal_rxx(fit) # Calculating marginal reliability.
 # ...and then plot the marginal reliability across the latent trait spectrum.
 conRelPlot(fit, title="Reliability of the RWA Scale Given to the θ Level")
 # The RWA scale seems to be optimal (having sufficient reliability - 0.75) for measuring participants with theta levels between
-# -2SD and +4SD. However, there is an unusual dip on the right side of the curve.
+# -2SD and +4SD. 
 
-# Let's compare IRT-based reliability and unweighted sum score based reliability.
+# Let's compare IRT-based reliability and unweighted sum-score based reliability.
 
 omega(rwa) # This script computes several reliability coefficients
 # As we see here, the RWA scale is internally consistent.
