@@ -28,7 +28,7 @@ author:
         department: Faculty of Psychology
         city: Malang
         region: Jawa Timur, Indonesia
-abstract: "This tutorial paper introduces the Graded Response Model (GRM), a tool for testing measurement precision under the Item Response Theory (IRT) paradigm. Addressing common problems of measurement imprecision and lack of construct validity, the tutorial guides researchers through a one-dimensional GRM analysis in the R environment, using psych, mirt, and ggmirt packages. GRM is specifically designed to examine the psychometric properties of psychological scales with polytomous items. The tutorial illustrates the procedure using data from the Open Psychometrics Database on the Right-Wing Authoritarianism (RWA) scale, outlining the theoretical underpinnings of GRM, and steps for data preparation, model fitting, interpretation of results, and dealing with common issues and anomalies that may typically arise in the process."
+abstract: "This tutorial paper introduces the Graded Response Model (GRM), a tool for testing measurement precision under the Item Response Theory (IRT) paradigm. Addressing common problems of measurement imprecision and lack of construct validity, the tutorial guides researchers through a unidimensional GRM analysis in the R environment, using psych, mirt, and ggmirt packages. GRM is specifically designed to examine the psychometric properties of psychological scales with polytomous (Likert-style) items. The tutorial illustrates the procedure using data from the Open Psychometrics Database on the Right-Wing Authoritarianism (RWA) scale, outlining the theoretical underpinnings of GRM, and steps for data preparation, model fitting, interpretation of results, and dealing with common issues and anomalies that may typically arise in the process."
 keywords:
   - graded response model
   - item response theory
@@ -322,7 +322,7 @@ item.fit <- itemfit(fit) # Estimating item fit statistics and saving them in a d
 print(item.fit) # Calling the data frame.
 ```
 
-The output of this function is provided in {apatb-table5}, which shows fit statistics for an individual item. All items have very good (low) *RMSEA* values but normally, we want the *p* values of the scaled $\chi$^2^ to be nonsignificant, implying there is no discrepancy between the observed response pattern with what the model predicts. In {apatb-table5}, only three items here are nonsignificant (Q2, Q4, and Q12), which strengthens our suspicion that the RWA items might not be locally independent. 
+The output of this function is provided in {apatb-table5}, which shows fit statistics for an individual item. All items have very good (low) *RMSEA* values but normally, we want the *p* values of the scaled $\chi$^2^ to be nonsignificant, implying that there is no discrepancy between the observed response pattern with what the model predicts. In {apatb-table5}, only three items here are nonsignificant (Q2, Q4, and Q12), which strengthens our suspicion that the RWA items might not be locally independent. 
 
 ## Step 5: Model Residuals
 
@@ -394,32 +394,63 @@ It is also possible to evaluate the overall performance of the RWA scale by plot
 testInfoPlot(fit, title = "Test Information Function of the RWA Scale")
 ```
 
-The output of this code is {apafg-fig6}, and according to this, the RWA scale as a whole is informative for measuring individuals with a wide range of RWA levels, i.e., between -2*SD* to +4*SD*. 
+The output of this code is {apafg-fig6}, and according to this, the RWA scale as a whole is informative for measuring a group of individuals with a wide range of RWA levels, i.e., between -2*SD* to +4*SD*. However, the RWA scale is not optimal for measuring individuals with RWA levels below or beyond this range.
 
 ## Step 7: Computing Reliability
 
+The heart of an IRT analysis is to estimate the precision of the measure, which can vary given different levels of   $\theta$. *mirt* provides two strategies to compute reliability that differs in their assumption regarding the distribution of $\theta$. First, readers may calculate marginal reliability by running this simple command:
+
 ```{r}
+marginal_rxx(fit)
+```
+```{r}
+#| include: false
+
 m_rel <- marginal_rxx(fit)
+m_rel = round(m_rel, digits=3)
 ```
 
-lhalalala
+The output of the above code is `r m_rel`, which indicates that the RWA scale as a whole is reliable, assuming that the underlying $\theta$ distribution follows the Gaussian or normal distribution [@chalmersAnswerDifferenceEmpirical2019]. Since reliability can vary across different levels of $\theta$, readers can also visualize the scale's reliability given the levels of $\theta$ by running the function of *ggmirt* package, as follows:
 
 ```{r}
 conRelPlot(fit, title = "Reliability of the RWA Scale Given to the θ Level")
 ```
 
-{apafg-fig7}
+The output of this code is {apafg-fig7}, which shows that the RWA scale can measure individuals with $\theta$ levels between -2*SD* and +4*SD* with sufficient reliability, i.e., *r*~xx~ $\geq$ 0.75. 
+
+Second, *mirt* can also calculate the RWA scale overall reliability using $\theta$ predicted by the model. To compute empirical reliability, one needs to calculate estimated $\theta$ value of each participant first, and then, calculate reliability based on these values. To do this, readers can run these two lines of codes:
 
 ```{r}
-theta_se <- fscores(fit, full.scores.SE = T) # Extracting the estimated theta score of each participant.
-e_rel <- empirical_rxx(theta_se) # Then use the estimated theta to calculate empirical reliability.
+theta_se <- fscores(fit, full.scores.SE = TRUE) # Extracting the estimated theta score of each participant.
+empirical_rxx(theta_se) # Then use the estimated theta to calculate empirical reliability.
+```
+```{r}
+#| include: false
+
+e_rel <- empirical_rxx(theta_se)
+e_rel = round(e_rel, digits=3)
 ```
 
-lhalalala
+The `fscores()` function is used to compute the estimated $\theta$ value for each participant predicted by the `fit` model. The `full.scores.SE` is set to `TRUE` because the package uses the $\theta$ value and standard error of each participant (*SE*~$\theta$~) to compute the empirical reliability. We store the estimated $\theta$ and its *SE*~$\theta$~ in a new data frame, namely `theta_se`, and then run `empirical_rxx()` function to calculate empirical reliability. The output of these codes is `r e_rel`, which is very close to marginal reliability. However, it is very important to note that while marginal and empirical reliability aim to quantify the scale's overall reliability, they base the calculations on different assumptions. Marginal reliability assumes that $\theta$ is normally distributed, and empirical reliability uses $\theta$ distribution predicted by the model, which still contains measurement errors but more realistic.
+
+It is very important to note that our model has a poor fit, as we showed in step 4. In practice, we recommend that readers address the model fitting issues before interpreting reliability or drawing substantive conclusions based on these estimates. 
+
+To paint a more comprehensive picture, we can compare IRT-based reliability calculations with unweighted sum-score based reliability, such as Cronbach's $\alpha$ and McDonald's $\omega$. To do this, we can use `omega()` function provided by *psych* package [@revellePsychProceduresPsychological2023], which can be done by running this command:
 
 ```{r}
 omega(rwa)
 ```
+```{r}
+#| include: false
+
+om <- omega(rwa)
+alpha <- om$alpha
+alpha = round(alpha, digits = 3)
+oh <- om$omega_h
+oh = round(oh, digits = 3)
+```
+
+The output of `omega()` function includes many information but we only focus on Cronbach's $\alpha$ and McDonald's $\omega$~h~. Both Cronbach's $\alpha$ ($\alpha$ = `r alpha`) and McDonald's $\omega$ ($\omega$~h~ = `r oh`) shows that the RWA scale is overall internally consistent. 
 
 # Conclusions
 

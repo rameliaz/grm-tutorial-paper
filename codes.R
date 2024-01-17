@@ -289,7 +289,7 @@ empirical_rxx(theta_se) # Then use the estimated theta to calculate empirical re
 # Reliability seems to be pretty good.
 
 # Now we need to calculate marginal reliability.
-marginal_rxx(fit) # Calculating marginal reliability.
+m_rel <- marginal_rxx(fit) # Calculating marginal reliability.
 # Marginal reliability is almost similar to empirical reliability.
 
 # ...and then plot the marginal reliability across the latent trait spectrum.
