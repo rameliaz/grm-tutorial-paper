@@ -231,8 +231,8 @@ This command summarizes key descriptive statistics of a data frame, and the summ
 
 # Transforming describe() output into a APA-formatted table
 rwa <- subset(ds, select = Q1:Q22)
-table1 <- psych::describe(rwa); table1 <- as.data.frame(table1)
-table1 <- table1 %>% 
+table2 <- psych::describe(rwa); table2 <- as.data.frame(table2)
+table2 <- table2 %>% 
   rownames_to_column(var="Item") %>% 
   select(Item, mean, sd, min, max, range, n) %>% 
   rename(Mean=mean, SD=sd, Minimum=min, Maximum=max, Range=range) %>% 
@@ -240,11 +240,11 @@ table1 <- table1 %>%
   theme_apa() %>% 
   line_spacing(part = "all") %>% 
   padding(padding.top = 5, padding.bottom = 5)
-table1 <- colformat_double(x=table1, j="Minimum", digits = 0)
-table1 <- colformat_double(x=table1, j="Maximum", digits = 0)
-table1 <- colformat_double(x=table1, j="Range", digits = 0)
-table1 <- colformat_double(x=table1, j="n", digits = 0)
-table1
+table2 <- colformat_double(x=table2, j="Minimum", digits = 0)
+table2 <- colformat_double(x=table2, j="Maximum", digits = 0)
+table2 <- colformat_double(x=table2, j="Range", digits = 0)
+table2 <- colformat_double(x=table2, j="n", digits = 0)
+table2
 ```
 
 {{< pagebreak >}}
@@ -292,8 +292,8 @@ unfav <- c("Q4","Q6","Q8","Q9","Q11","Q13","Q15","Q18","Q20","Q21") # Now we cre
 rwa <- rwa %>% 
   mutate(across(all_of(unfav), ~ 10 - .))# We simply subtract the scores from 9 (the maximum) to reverse code the unfavorable items.
 # Transforming describe() output into a APA-formatted table
-table2 <- psych::describe(rwa); table2 <- as.data.frame(table2)
-table2 <- table2 %>% 
+table3 <- psych::describe(rwa); table3 <- as.data.frame(table3)
+table3 <- table3 %>% 
   rownames_to_column(var="Item") %>% 
   select(Item, mean, sd, min, max, range, n) %>% 
   rename(Mean=mean, SD=sd, Minimum=min, Maximum=max, Range=range) %>% 
@@ -301,11 +301,11 @@ table2 <- table2 %>%
   theme_apa() %>% 
   line_spacing(part = "all") %>% 
   padding(padding.top = 5, padding.bottom = 5)
-table2 <- colformat_double(x=table2, j="Minimum", digits = 0)
-table2 <- colformat_double(x=table2, j="Maximum", digits = 0)
-table2 <- colformat_double(x=table2, j="Range", digits = 0)
-table2 <- colformat_double(x=table2, j="n", digits = 0)
-table2
+table3 <- colformat_double(x=table3, j="Minimum", digits = 0)
+table3 <- colformat_double(x=table3, j="Maximum", digits = 0)
+table3 <- colformat_double(x=table3, j="Range", digits = 0)
+table3 <- colformat_double(x=table3, j="n", digits = 0)
+table3
 ```
 
 {{< pagebreak >}}
@@ -429,11 +429,11 @@ sum <- summary(fit)
 #| ft.align: left
 #| column: page
 
-table3 <- as.data.frame(coefs$items)
+table4 <- as.data.frame(coefs$items)
 load <- as.data.frame(sum$rotF)
 h2 <- as.data.frame(sum$h2)
-table3 <- cbind(table3, load, h2)
-table3 <- table3 %>% 
+table4 <- cbind(table4, load, h2)
+table4 <- table4 %>% 
   rownames_to_column(var="Item") %>% 
   select(Item, a, b1, b2, b3, b4, b5, b6, b7, b8, rwa, h2) %>% 
   rename(λ=rwa) %>% 
@@ -441,16 +441,16 @@ table3 <- table3 %>%
   theme_apa() %>% 
   line_spacing(part = "all") %>% 
   padding(padding.top = 5, padding.bottom = 5)
-table3 <- colformat_double(x=table3, j="a", digits = 2)
-table3 <- colformat_double(x=table3, j="b1", digits = 2)
-table3 <- colformat_double(x=table3, j="b2", digits = 2)
-table3 <- colformat_double(x=table3, j="b3", digits = 2)
-table3 <- colformat_double(x=table3, j="b4", digits = 2)
-table3 <- colformat_double(x=table3, j="b5", digits = 2)
-table3 <- colformat_double(x=table3, j="b6", digits = 2)
-table3 <- colformat_double(x=table3, j="b7", digits = 2)
-table3 <- colformat_double(x=table3, j="b8", digits = 2)
-table3
+table4 <- colformat_double(x=table4, j="a", digits = 2)
+table4 <- colformat_double(x=table4, j="b1", digits = 2)
+table4 <- colformat_double(x=table4, j="b2", digits = 2)
+table4 <- colformat_double(x=table4, j="b3", digits = 2)
+table4 <- colformat_double(x=table4, j="b4", digits = 2)
+table4 <- colformat_double(x=table4, j="b5", digits = 2)
+table4 <- colformat_double(x=table4, j="b6", digits = 2)
+table4 <- colformat_double(x=table4, j="b7", digits = 2)
+table4 <- colformat_double(x=table4, j="b8", digits = 2)
+table4
 
 ```
 
@@ -481,7 +481,7 @@ cfi = round(cfi, digits=3)
 
 *mirt* calculates the *M*~2~ statistics [@maydeu-olivaresLimitedInformationGoodnessoffit2006] and other GOF indices, such as Root Mean Square Error of Approximation (RMSEA), Comparative Fit Index (CFI), Tucker-Lewis Index (TLI), and Standardized Root-Mean-Square Residual (SRMSR) after running the code above. Here, we set the `type` option to `"C2"` because it is suitable for computing *M*~2~ statistics in polytomous models. The interpretation of GOF statistics is similar to a general guide for interpreting GOF in CFA or SEM models [@schermelleh-engelEvaluatingFitStructural2003], which are *RMSEA* $\leq$ 0.05, *SRMSR* \< 0.05, *TLI* and *CFI* $\geq$ 0.97.
 
-According to our analysis, the model overall does not fit the data well (*M*~2~(`r df`) = `r m2_stat`, *p* \< .005, *RMSEA* = `r rmsea`, *SRMSR* = `r srmsr`, TLI = `r tli`, CFI = `r cfi`), because there is a significant discrepancy between response patterns predicted by the model with the data, as shown by significant *M*~2~ statistics. All GOF statistics, except for CFI, do not indicate a good fit. Model misfit, in this case, may be caused by local dependency between the items. We will explore this issue further in the next part.
+According to our analysis, the model overall does not fit the data well (*M*~2~(`r df`) = `r m2_stat`, *p* \< .05, *RMSEA* = `r rmsea`, *SRMSR* = `r srmsr`, TLI = `r tli`, CFI = `r cfi`), because there is a significant discrepancy between response patterns predicted by the model with the data, as shown by significant *M*~2~ statistics. All GOF statistics, except for CFI, do not indicate a good fit. Model misfit, in this case, may be caused by local dependency between the items. We will explore this issue further in the next part.
 
 Next, we calculate item-level fit statistics, i.e., the signed \$\\chi\$^2^ statistics, by running the following function:
 
@@ -501,19 +501,19 @@ The output of this function is provided in {apatb-table5}, which shows fit stati
 #| apa-note: Signed χ2 Statistics. RMSEA = Root Mean Square Error of Approximation, CFI = Comparative Fit Index, TLI = Tucker-Lewis Index, SRMR = Standardized Root Mean Square Residual.
 #| ft.align: left
 
-table4 <- as.data.frame(item.fit)
-table4 <- table4 %>%
+table5 <- as.data.frame(itemfit(fit))
+table5 <- table5 %>%
   select(item, S_X2, df.S_X2, RMSEA.S_X2, p.S_X2) %>% 
-  rename(Item=item, χ2=S_X2, df=df.S_X2, RMSEA=RMSEA.S_X2, p=p.S_X2) %>% 
+  rename(Item=item, Sχ2=S_X2, df=df.S_X2, RMSEA=RMSEA.S_X2, p=p.S_X2) %>% 
   flextable() %>% 
   theme_apa() %>% 
   line_spacing(part = "all") %>% 
   padding(padding.top = 5, padding.bottom = 5)
-table4 <- colformat_double(x=table4, j="χ2", digits = 2)
-table4 <- colformat_double(x=table4, j="df", digits = 2)
-table4 <- colformat_double(x=table4, j="RMSEA", digits = 2)
-table4 <- colformat_double(x=table4, j="p", digits = 2)
-table4
+table5 <- colformat_double(x=table5, j="Sχ2", digits = 2)
+table5 <- colformat_double(x=table5, j="df", digits = 0)
+table5 <- colformat_double(x=table5, j="RMSEA", digits = 3)
+table5 <- colformat_double(x=table5, j="p", digits = 3)
+table5
 
 ```
 
