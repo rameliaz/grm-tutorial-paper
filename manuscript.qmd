@@ -1,0 +1,676 @@
+---
+title: "Getting Started with the Graded Response Model (GRM): A gentle introduction and tutorial in R"
+shorttitle: "The Graded Response Model Tutorial"
+author:
+  - name: Rizqy Amelia Zein
+    corresponding: true
+    orcid: 0000-0001-7840-0299
+    email: amelia.zein@psikologi.unair.ac.id
+    affiliations:
+      - name: Universitas Airlangga
+        department: Department of Psychology
+        address: Jalan Airlangga 4-6
+        city: Surabaya
+        region: Jawa Timur, Indonesia
+        postal-code: "60286"
+      - name: Ludwig-Maximilians-Universität
+        department: Department of Psychology
+        address: Leopoldstraße 13
+        city: Munich
+        postal-code: "80802"
+  - name: Hanif Akhtar
+    orcid: 0000-0002-1388-7347
+    affiliations:
+      - name: ELTE Eötvös Loránd University
+        department: Doctoral School of Psychology
+        country: Hungary
+      - name: Universitas Muhammadiyah Malang
+        department: Faculty of Psychology
+        city: Malang
+        region: Jawa Timur, Indonesia
+abstract: "This tutorial introduces the Graded Response Model (GRM), a tool for testing measurement precision within the Item Response Theory (IRT) paradigm. Addressing common problems of measurement imprecision and lack of construct validity, the tutorial guides researchers through a unidimensional GRM analysis in the R environment, using psych, mirt, and ggmirt packages. GRM is specifically designed to examine the psychometric properties of psychological scales with polytomous (Likert-style) items. The tutorial illustrates the procedure using data from the Open Psychometrics Database on the Right-Wing Authoritarianism (RWA) scale, outlining the theoretical underpinnings of GRM, and steps for data preparation, testing model assumptions, model fitting, and interpretation of results."
+keywords:
+  - graded response model
+  - item response theory
+  - mirt
+  - ggmirt
+  - psych
+  - R
+author-note:
+  disclosures:
+    conflict-of-interest: "We declare we have no competing interests."
+    financial-support: "The first author receives a PhD scholarship from the German Academic Exchange Service (Deutscher Akademischer Austauschdienst, DAAD)."
+lang: en
+bibliography: references.bib
+format:
+  apaquarto-docx: default
+editor: visual
+execute: 
+  warning: false
+  error: false
+  output: false
+  echo: true
+---
+
+{{< include _extensions/wjschne/apaquarto/_apa_title.qmd >}}
+
+```{r}
+#| include: false
+#| label: "setup"
+
+install.packages("flextable", dependencies=TRUE) 
+library(flextable)
+```
+
+Only half of published findings include evidence of measurement validity [@flakeConstructValidationSocial2017] and a large proportion of published studies suffer from hidden invalidity [@husseyHiddenInvalidity152020]. Lack of evidence for measurement validity can raise serious concerns about the replicability of research findings, as it directly contributes to the invalidity of the findings [@flakeMeasurementSchmeasurementQuestionable2020; @lilienfeldPsychologicalMeasurementReplication2020]. Furthermore, the lack of evidence for measurement validity can hamper consensus on the best way to measure a construct, which becomes a major obstacle to the establishment of cumulative psychological science [@elsonPsychologicalMeasuresAren2023]. Given these circumstances, it is critical to provide applied psychological researchers with a set of tools and practical steps to help them assess measurement validity so that they can ensure the credibility of their findings.
+
+The purpose of this article is to provide a brief introduction to the Graded Response Model (GRM), a family of item response models specifically designed to assess the measurement precision of a polytomous (Likert-style) scale. We begin this paper by briefly explaining the basics of Item Response Theory (IRT) and contrasting its differences with the widely known Classical True Score Theory (CTT). In this paper, we aim to keep our tutorial concise, so we do not cover all IRT concepts in detail. Interested readers are referred to available didactic texts on IRT, such as @embretsonItemResponseTheory2000 for the introductory level, and @bakerBasicsItemResponse2017 and @deayalaTheoryPracticeItem2022 for a more technical and comprehensive overview.
+
+Further, we briefly explain what GRM is and how it is specified. In this part, we highlight how model and item parameters are specified and interpreted as well as visualizations derived from a GRM analysis. We also introduce three key assumptions underlying a GRM and how to test these assumptions. We then provide an illustrative example of testing measurement precision using a GRM analysis, and in this part, we show how to practically implement a GRM analysis and interpret its results. We complement the illustrative example with code in the open-source programming language R [@rcoreteamLanguageEnvironmentStatistical2023] so that the readers can implement and reproduce the example presented in this paper. Readers with some experience in R and RStudio can easily follow this tutorial, but for those who are not yet familiar with R, we refer them to excellent, easy-to-follow materials developed by @navarroPsychologicalScience2018. Finally, we present some concluding remarks to encourage researchers to implement a GRM analysis as a part of their routine.
+
+# A Brief Overview of Item Response Theory
+
+To scrutinize their measurement quality, psychological researchers have relied on two basic principles underlying psychological testing, i.e., CTT and IRT, to decompose observed scores into their *deterministic* and *random* or stochastic components [@zumboValidityFoundationalIssues2006]. CTT, on the one hand, decomposes observed outcomes into *true* scores and *error* components. In practice, researchers implement this principle by performing structural equation modeling (SEM), exploratory factor analysis (EFA), or confirmatory factor analysis (CFA). Specifying the measurement part of a SEM model, or estimating EFA and CFA models, allows the covariance matrix of a given set of data to be decomposed into latent factors, which represent the true score or trait level, and error terms (i.e., residuals or unique variances). Consequently, the relationship between observed score and true score is *linear*, since true score is essentially a linear transformation of observed score [@embretsonItemResponseTheory2000]. IRT, on the other hand, models this relationship in a *probabilistic* rather than a linear fashion. More specifically, an IRT model assumes a probabilistic relationship between the observed score and the latent trait being measured ($\theta$), and in particular, this probability takes into account item properties such as item discrimination, difficulty, and, when appropriate, guessing [@bakerBasicsItemResponse2017].
+
+The most critical distinction between CTT and IRT is how they conceptualize measurement error. In CTT, standard deviation of the observed score (*s*) is used to calculate standard error of measurement. Therefore, CTT assumes that measurement error is sample-dependent and constant for all individuals in the sample regardless of their trait level. This shortcoming limits the utility of CTT, especially since psychologists often need to interpret individual scores, rather than just evaluate the test as a whole. Additionally, since standard error of measurement is also a function of reliability, reliability is assumed to be the same across different levels of a trait or ability. This assumption is unrealistic since researchers often encounter situations where a test is overly difficult for a group of low-performing participants, providing little information beyond an indication that their trait or ability level is significantly lower than what the test can measure.
+
+IRT offers an elegant solution to this issue by allowing the calculation of standard errors for each individual (*SE*$\theta$), and thus, test reliability can be inferred from the average of *SE*$\theta$ across a sample of participants [@embretsonItemResponseTheory2000; @langSciencePracticeItem2021]. This approach allows for the estimation of reliability at varying levels of trait or ability (i.e., test information function - TIF). By doing this, when a test is overly challenging for low-performing individuals or too easy for high-performing individuals, IRT can help identify the levels of trait or ability at which the test is most reliable. A concrete example of this is a study that examined the reliability of the Short Dark Tetrad (SD4) scale from an IRT perspective [@blotnerDarkTriadDead2022]. According to this study, the sadism sub-scale of the SD4 is the most reliable for measuring individuals with average to high levels ($\bar{x}$ \< $\theta$ \< 2.5 *SD*) of sadism but suboptimal for measuring individuals with lower levels of sadism [@blotnerDarkTriadDead2022]. In this sense, IRT models offer a more informative and nuanced perspective that proves useful for researchers who wish to closely examine the performance of their measures.
+
+Further, IRT allows researchers to examine the performance of a specific item by specifying the relationship between item score and $\theta$ given one-, two-, or three-parameter. The one-parameter logistic (1PL) or a Rasch model, the simplest variant of the IRT models, accounts for only item difficulty (*b*) while assuming equal item discrimination (*a*) across items. In practice, this model overlaps slightly with CTT in the sense that they assume that all items have equal informative value, so that the estimated $\theta$ of a 1PL/Rasch model is identical to the sum score of CTT [@langSciencePracticeItem2021; @stemlerRaschMeasurementItem2021]. This notion actually stems from a philosophical principle of *specific objectivity*, which requires that comparisons between measures remain independent of both the item and individual characteristics [@raschSpecificObjectivityAttempt1977]. Put simply, a Rasch model assumes that the latent trait ($\theta$) should remain unaffected by specific items used in the test. More concretely, the difference in depression levels between two individuals should always be the same regardless of the scale used to measure their depression levels. While this principle reasonably enforces objectivity in measurement practices, it requires a strong theory underlying the construct and strict requirements of data-model fit, and both of these assumptions rarely hold in a real-world scenario, especially in psychological science.
+
+Furthermore, the two-parameter logistic (2PL) model fills this gap by allowing for differences in item ability to differentiate individuals with varying levels of $\theta$ (i.e., item discrimination parameter - *a*). In addition, in some contexts, researchers may suspect that some parts of the probabilistic relationship between observed score and $\theta$ is explained by guessing, thus three-parameter logistic (3PL) model incorporates guessing parameter (*c*). The field of IRT has rapidly evolved to include various models suited to specific contexts, such as handling ordinal responses [@murakiGeneralizedPartialCredit1992; @samejimaGradedResponseModel1997], categorical responses [@thissenNominalCategoriesItem2013], or assessing multidimensional traits simultaneously [@bockMarginalMaximumLikelihood1981; @chalmersMirtMultidimensionalItem2012]. It is important to note that 1PL, 2PL, and 3PL models are only applicable to binary or dichotomous data (e.g., true/false responses), and the focus of this article is nonetheless to demonstrate the utility of IRT for fitting the ordered (Likert-style) responses. We briefly summarize the features of the most commonly used IRT models in {apatb-table1}.
+
+{{< pagebreak >}}
+
+```{r}
+#| label: apatb-table1
+#| apa-cap: Comparison Between The Commonly Used IRT Models
+#| apa-note: NULL
+#| echo: false
+```
+
++-----------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------+-------------------------+
+| Model                                   | Key Characteristics                                                                                                                                         | Data Type   | Response Options        |
++=========================================+=============================================================================================================================================================+=============+=========================+
+| 1-PL Model (Rasch Model)                | 1\. Estimates only item difficulties (*b*).                                                                                                                 | Dichotomous | Correct/Incorrect (0/1) |
+|                                         |                                                                                                                                                             |             |                         |
+|                                         | 2\. Assumes that all items have equal discrimination parameters (*a*).                                                                                      |             |                         |
+|                                         |                                                                                                                                                             |             |                         |
+|                                         | 3\. Item and person parameters are independent.                                                                                                             |             |                         |
++-----------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------+-------------------------+
+| 2-PL Model                              | 1\. Estimates item difficulties (*b*) and item discrimination (*a*).                                                                                        | Dichotomous | Correct/Incorrect (0/1) |
+|                                         |                                                                                                                                                             |             |                         |
+|                                         | 2\. Less stringent than 1-PL model since it allows item discrimination parameters (*a*) to vary.                                                            |             |                         |
++-----------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------+-------------------------+
+| 3-PL Model                              | 1\. Estimates item difficulties (*b*), discrimination (*a*), and pseudo-guessing parameter (*c*).                                                           | Dichotomous | Correct/Incorrect (0/1) |
+|                                         |                                                                                                                                                             |             |                         |
+|                                         | 2\. Appropriate for modeling a test data with multiple responses (e.g., multiple-choice tests), and thus, guessing might influence participants' responses. |             |                         |
++-----------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------+-------------------------+
+| Graded Response Model (GRM)             | 1\. Appropriate for modeling ordinal data with more than two response categories (i.e., Likert-style).                                                      | Polytomous  | Ordered Categories      |
+|                                         |                                                                                                                                                             |             |                         |
+|                                         | 2\. Estimates a discrimination parameter (*a*) and multiple threshold parameters (*b*) per item.                                                            |             |                         |
++-----------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------+-------------------------+
+| Partial Credit Model (PCM)              | 1\. An extension of the 1-PL (Rasch) model for polytomous items.                                                                                            | Polytomous  | Ordered Categories      |
+|                                         |                                                                                                                                                             |             |                         |
+|                                         | 2\. Estimates thresholds between adjacent categories but assumes equal discrimination across items.                                                         |             |                         |
++-----------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------+-------------------------+
+| Generalized Partial Credit Model (GPCM) | Extending PCM to allow differential discrimination parameters across items.                                                                                 | Polytomous  | Ordered Categories      |
++-----------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------+-------------------------+
+| Nominal Response Model (NRM)            | 1\. Appropriate for modeling categorical responses with no order.                                                                                           | Categorical | Unordered Categories    |
+|                                         |                                                                                                                                                             |             |                         |
+|                                         | 2\. Estimates discrimination parameters (*a*) and multiple category-specific parameters (*b*).                                                              |             |                         |
++-----------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------+-------------------------+
+
+{{< pagebreak >}}
+
+# Graded Response Model
+
+The GRM is a family of IRT models specifically designed to analyze ordered polytomous (Likert-style) data [@samejimaGradedResponseModel1997; @samejimaGeneralGradedResponse2010; @samejimaGradedResponseModels2016]. The fundamental idea of GRM is to extend the logic of simpler dichotomous IRT models to polytomous scales by applying a probabilistic function to each response category. In dichotomous 2PL IRT models, the probability of answering a correct response is modeled as a function of $\theta$, item difficulty (*b*), and item discrimination (*a*). GRM extends this idea by modeling the probability of selecting certain response category or higher on an item (i.e., *step function*) given to item difficulty (*b*) and discrimination (*a*). For each response category (e.g., answering "agree" on a five-point Likert scale), GRM calculates the cumulative probability of a participant answering "agree" or above, given to their $\theta$. Therefore, the notion of item difficulty in dichotomous IRT models is extended to the step function (i.e., item threshold - *b*) to handle ordered polytomous data.
+
+To illustrate the step function, consider a scale measuring sadistic personality (e.g., "*watching a fist-fight excites me*," etc.) with response categories ranging from 1 (*strongly disagree*) to 4 (*strongly agree*). Imagine these categories are hierarchically ordered from the lowest category (*strongly disagree*) to the highest (*strongly agree*), like a staircase. GRM aims to estimate the level of sadistic personality ($\theta$) required for "stepping" from one response category to another (e.g., *moderately agree* to *strongly agree*). Therefore, a GRM model of a five-point Likert scale calculates four item threshold parameters (*b*): the location of $\theta$ level where individuals are equally likely to respond 1 or 2 (*b*~1~), 2 or 3 (*b*~2~), 3 or 4 (*b*~3~), and 4 or 5 (*b*~4~). Each threshold is exactly the point where a participant is equally likely to respond to either of the adjacent response categories. For example, if *b*~1~ = -1.23 for the item "*watching a fist-fight excites me*", it implies that participants with sadism level 1.23 below the mean are equally likely to either answer *strongly disagree* or *moderately disagree*.
+
+{apafg-fig1} shows an example of an item probability function (IPF) from an item on a scale with five response categories. In general, IPF describes a relationship between $\theta$ (x-axis) and the probability of endorsing a response category (y-axis - *P*$\theta$). {apafg-fig1} consists of five category probability curves, each of which represents the probability of endorsing a response category given $\theta$. Item threshold is exactly the location of $\theta$ where two adjacent category probability curves cross each other.
+
+{{< pagebreak >}}
+
+```{r}
+#| label: apafg-fig1
+#| apa-cap: An Item Probability Function from a GRM Model
+#| apa-note: NULL
+#| output: true
+#| echo: false
+
+knitr::include_graphics("CPF example.png")
+```
+
+{{< pagebreak >}}
+
+## Assumptions
+
+The first key assumption of a GRM is that $\theta$ is monotonically correlated with the probability of endorsing a response category. More sharply, individuals with higher levels of $\theta$ should have a higher probability of endorsing response category that represents greater intensity of the traits [@hambletonIRTModelsAnalysis2010]. For instance, people with a higher tendency of sadistic personality have a greater chance of answering "*moderately agree*" or "*strongly agree*" on a sadism scale compared to those with lower levels of sadism.
+
+The second key assumption pertains to the unidimensionality of $\theta$. This implies that the item pool tested using a GRM analysis should represent only one latent trait ($\theta$). Although it is indeed possible to account for multiple $\theta$ in an IRT model (multidimensional IRT, see @bockFullInformationItemFactor1988, we limit the scope of our tutorial to the unidimensional GRM. A unidimensional IRT model can still be robustly applied to multidimensional data if multiple latent traits are moderately intercorrelated or when there is a strong general factor (*g*) underlying the data [@reiseEvaluatingImpactMultidimensionality2015]. To test whether an item pool represents only one $\theta$, researchers can apply a parallel analysis [@guoAssessingDimensionalityIRT2023] or a factor analysis [@hambletonAssessingDimensionalitySet1986], before specifying their GRM models.
+
+Relatedly, a GRM model assumes that the item pool is locally independent, as the third assumption. Local independence suggests that participants' responses to one item do not influence their response to another. It is important to note that evidence for unidimensionality does not always warrant local independence. As an eyeball example - consider a scale measuring trust in science, which contains: "*I trust scientists working in natural science*" and "*Most biologists are trustworthy*." While both items might measure the same latent trait (i.e., trust in science), those who trust scientists working in natural science are very likely to also trust biologists. To test whether items are locally independent, researchers can examine the relationships between item responses after accounting for $\theta$ by performing residual correlation analysis [@chenLocalDependenceIndexes1997].
+
+# An Illustrative Example of Graded Response Model: The Right Wing Authoritarianism (RWA) Scale
+
+## A Brief Overview of the Altemeyer's RWA Scale
+
+To illustrate the application of GRM for analyzing measurement precision of an ordered polytomous scale, we provide an example of a GRM analysis of the RWA scale data [@altemeyerRightwingAuthoritarianism1981; @altemeyerAuthoritarians2006]. @altemeyerRightwingAuthoritarianism1981 defines RWA as a personality propensity to blindly abide by established authorities (i.e., authoritarian submission), to act aggressively toward individuals who are perceived to be punished by these established authorities (i.e., authoritarian aggression), and to uphold traditional values promoted by the authorities (i.e., conventionalism). Individuals with higher levels of RWA tend to view the world as a dangerous place [@duckittDualProcessMotivational2017], and thus, to ensure stability and safety, they are motivated to preserve social order by deferring to those whom they perceive as legal, social, or moral authorities; for instance, the government, religious institutions, or political or religious or military leaders [@saundersRightWingAuthoritarianismScale2017]. The RWA scale developed by @altemeyerRightwingAuthoritarianism1981 remains one of the most important measures in the field of social and political psychology [@saundersRightWingAuthoritarianismScale2017], and has helped researchers to conceptualize the role of RWA in shaping various social psychological outcomes, such as prejudice, political behavior, and various antisocial behaviors [@akramiRightWingAuthoritarianismSocial2006; @osbornePsychologicalCausesSocietal2023; @sibleyPersonalityPoliticalOrientation2012].
+
+In this paper, we use the most recent version of the RWA scale [@altemeyerAuthoritarians2006], which consists of 22 items in which participants are asked to indicate their agreement with the items on a nine-point scale ranging from "*strongly disagree*" (-4) to "*strongly agree*" (+4). While the RWA scale consists of three sub-dimensions, i.e., Submissiveness, Aggression, and Conventionalism, the RWA scale is theoretically assumed to be unidimensional because [@altemeyerAuthoritarians2006] shows that these sub-dimensions are strongly intercorrelated. While there is some evidence to the contrary [@duckittMultidimensionalityRightWingAuthoritarian2013], for the purposes of this article we will assume that the RWA scale is unidimensional.
+
+# Disclosure and Data Availability Statements
+
+To maximize the reproducibility of our illustrative example, we wrote the article as a Quarto (.qmd) document, where we integrate the R codes used in the analysis as well as its outputs. We also include a longer, annotated R script file (.R) for the example we used as a supplementary document, which we highly recommend to use for a didactic purpose. The Quarto file (and its corresponding .docx and .pdf output) and R script file are publicly available on [a Github repository](). The dataset we used in this tutorial paper was obtained from a publicly accessible [Open-Source Psychometrics Project](http://openpsychometrics.org/_rawdata/).
+
+## Step 1: Data Preparation
+
+Before running the analysis, we need to install the necessary R packages, which are, *mirt* [@chalmersMirtMultidimensionalItem2023a; @chalmersMirtMultidimensionalItem2012], *psych* [@revellePsychProceduresPsychological2023], *ggmirt* [@masurGgmirt2023], *tidyverse* [@wickhamWelcomeTidyverse2019], *caret* [@kuhnCaretClassificationRegression2024], and *devtools* [@wickhamDevtoolsToolsMake2022], with these following commands:
+
+```{r}
+install.packages("tidyverse", # for data wrangling
+                 "psych", # for descriptive statistics and unidimensionality test
+                 "devtools", # for installing R package that is not available on CRAN
+                 "mirt", # for conducting the main GRM analysis
+                 "caret", # for helping us detecting large residuals correlation (local independence test)
+                 dependencies=TRUE)
+devtools::install_github("masurp/ggmirt") # remote ggmirt installation through GitHub repository
+```
+
+The above command also automatically requests to install dependency packages. Note that we install *ggmirt* directly from its GitHub repository because *ggmirt* is not yet available in the Comprehensive R Archive Network (CRAN). Next, we should activate the R packages by typing a command as follows:
+
+```{r}
+library(mirt); library(ggmirt); library(psych); library(tidyverse); library(caret)
+```
+
+Now after the packages are activated, we need to import the dataset to our R environment. The dataset (`data.csv`) and codebook (`codebook.txt`) are available in `data` folder in our repository. Readers can download them from our repository and then simply import the dataset with the following command:
+
+```{r}
+ds <- read.csv("data/data.csv")
+```
+
+However, since the dataset is openly accessible in the Open Psychometrics webpage, readers can also directly import the dataset from the Open Psychometrics webpage to their R environment. For interested readers, we show how to do this in detail in our annotated R script file.
+
+Next, it is important to examine the structure of the data frame (`ds`) to get a glimpse of its structure. By typing `str()` command, readers can examine the variables' name, number of cases, types of variables (integer or character), and the values of each variable. Then readers can match the information provided in their R console to the codebook.
+
+```{r}
+str(ds)
+```
+
+According to the information provided in the codebook, the responses to the RWA scale are denoted in `Q1` to `Q22`, each representing the score of each item of the RWA scale. Readers can also see the information of `Q1` to `Q22` variables in their R console: these variables are integer and have values ranging from 1 to 9. In the codebook, there is no information regarding what these values (i.e., 1-9) mean. However, we could reasonably assume that participants who chose "*strongly disagree*" (-4) were scored `1`, and those who opted for "*strongly agree*" (+4) were scored `9`.
+
+Please note that we are only interested in the responses of the RWA scale, so we should subset the dataset to contain only the variables we are interested in, and then, examine the structure again. To this end, readers can type these commands:
+
+```{r}
+rwa <- subset(ds, select = Q1:Q22)
+str(rwa)
+```
+
+Here, we have a new data frame namely `rwa`, which contains only the responses to the RWA scale (`Q1:Q22`). In the data frame `rwa`, we have 22 variables with 9,881 participants. Before proceeding to the analysis stage, we recommend readers to inspect descriptive statistics, which we explain the procedure in the next sub-section.
+
+## Step 2: Inspecting Key Descriptive Statistics
+
+To efficiently examine descriptive statistics, readers can make use of `describe()` function from *psych* package [@revellePsychProceduresPsychological2023] by typing a simple command:
+
+```{r}
+describe(rwa)
+```
+
+This command summarizes key descriptive statistics of a data frame, and the summary is provided in {apatb-table2}. As we see in {apatb-table2}, all variables have a minimum value of `0`, while the minimum score should be `1`.
+
+{{< pagebreak >}}
+
+```{r apatb-table2}
+#| output: true
+#| echo: false
+#| apa-cap: Descriptive Statistics of RWA Scale
+#| apa-note: SD = Standard Deviation
+#| ft.align: left
+
+# Transforming describe() output into a APA-formatted table
+rwa <- subset(ds, select = Q1:Q22)
+table1 <- psych::describe(rwa); table1 <- as.data.frame(table1)
+table1 <- table1 %>% 
+  rownames_to_column(var="Item") %>% 
+  select(Item, mean, sd, min, max, range, n) %>% 
+  rename(Mean=mean, SD=sd, Minimum=min, Maximum=max, Range=range) %>% 
+  flextable() %>%
+  theme_apa() %>% 
+  line_spacing(part = "all") %>% 
+  padding(padding.top = 5, padding.bottom = 5)
+table1 <- colformat_double(x=table1, j="Minimum", digits = 0)
+table1 <- colformat_double(x=table1, j="Maximum", digits = 0)
+table1 <- colformat_double(x=table1, j="Range", digits = 0)
+table1 <- colformat_double(x=table1, j="n", digits = 0)
+table1
+```
+
+{{< pagebreak >}}
+
+Again, there is no information provided in the codebook regarding what `0` actually represents. Therefore, before deciding what we should do next, it is better to find out how many `0` we have in the data frame. To this end, we can calculate the percentage of `0` in each item by running these commands:
+
+```{r}
+zero <- colSums(rwa == 0) / nrow(rwa) * 100 # Computing the percentage of "0" in each column.
+print(zero) # Showing the percentage of "0" for each item.
+```
+
+After executing these commands, readers can see the percentage of `0` in each items in their R console, which overall are very small, ranging from 0.09% to 0.32% of the total cases. Since the percentages are very small, `0` is likely a code for a missing value. It is important to note that *mirt* package uses the Expected-Maximization (EM) algorithm to estimate model parameters, and the EM algorithm can handle missing values [@chalmersMirtMultidimensionalItem2012]. If we decide to eliminate cases with missing values, we still have a sizable number of cases, nonetheless. Therefore, to simplify our analysis, we only keep cases with complete responses by executing these commands:
+
+```{r}
+rwa <- rwa %>%
+  mutate_all(~na_if(., 0)) %>%  # Recoding "0" with "NA" in all columns.
+  drop_na()  # Removing cases with any "NA" values.
+```
+
+If readers prefer to keep cases with missing values, especially when the sample size is low, readers can exclude `drop_na()` command.
+
+Interestingly, if we look at {apatb-table2} again, the mean scores of the items seem to differ drastically. Some items have high mean scores, ranging from 6 to 7, but some of those are comparatively low. The RWA scale indeed has some unfavorable items but, again, there is no information in the codebook whether these unfavorable items have been reversely coded. However, if we look closely at ten items with high mean ($\bar{x}$ \> 6), these are the items that are supposed to be unfavorable. Therefore, we can reasonably assume that unfavorable items have not been reversed in the original dataset, and we should do so by running these commands:
+
+```{r}
+unfav <- c("Q4","Q6","Q8","Q9","Q11","Q13","Q15","Q18","Q20","Q21") # Now we create a vector defining which items will be coded reversely.
+rwa <- rwa %>% 
+  mutate(across(all_of(unfav), ~ 10 - .))# We simply subtract the scores from 9 (the maximum) + 1 to reverse code the unfavorable items.
+```
+
+First, we define a vector namely `unfav` to identify which items should be reversed, and then we use `mutate()` function to reverse the score. This is simply done by subtracting the values of the unfavorable items from the maximum score plus one. We can examine descriptive statistics of our modified data frame by running `describe()` function again, and as readers can see in {apatb-table3}, now mean score across items does not drastically vary and has `1` as its minimum value.
+
+{{< pagebreak >}}
+
+```{r apatb-table3}
+#| output: true
+#| echo: false
+#| apa-cap: Descriptive Statistics of RWA Scale
+#| apa-note: Descriptive Statistics After Reversing Unfavorable Items and removing cases with NA. SD = Standard Deviation.
+#| ft.align: left
+
+rwa <- rwa %>%
+  mutate_all(~na_if(., 0)) %>%  # Replacing 0 with NA in all columns.
+  drop_na()  # Removing cases with any NA values.
+unfav <- c("Q4","Q6","Q8","Q9","Q11","Q13","Q15","Q18","Q20","Q21") # Now we create a vector defining which items will be coded reversely.
+rwa <- rwa %>% 
+  mutate(across(all_of(unfav), ~ 10 - .))# We simply subtract the scores from 9 (the maximum) to reverse code the unfavorable items.
+# Transforming describe() output into a APA-formatted table
+table2 <- psych::describe(rwa); table2 <- as.data.frame(table2)
+table2 <- table2 %>% 
+  rownames_to_column(var="Item") %>% 
+  select(Item, mean, sd, min, max, range, n) %>% 
+  rename(Mean=mean, SD=sd, Minimum=min, Maximum=max, Range=range) %>% 
+  flextable() %>% 
+  theme_apa() %>% 
+  line_spacing(part = "all") %>% 
+  padding(padding.top = 5, padding.bottom = 5)
+table2 <- colformat_double(x=table2, j="Minimum", digits = 0)
+table2 <- colformat_double(x=table2, j="Maximum", digits = 0)
+table2 <- colformat_double(x=table2, j="Range", digits = 0)
+table2 <- colformat_double(x=table2, j="n", digits = 0)
+table2
+```
+
+{{< pagebreak >}}
+
+## Step 3: Examining Dimensionality
+
+Next, we show the readers the ways of testing unidimensionality. To test the number of latent factors of an item pool, @deayalaAssessmentDimensionalityUse1991 suggest three alternatives, which are multidimensional scaling (MDS), EFA, and CFA. In this tutorial, we demonstrate the use of EFA, and *psych* package provides a very efficient way to do this by calling this command:
+
+```{r}
+#| eval: false
+
+irt.fa(rwa, nfactors = 1, fm = "minres")
+```
+
+`irt.fa` function is to run an EFA with a polychoric correlation matrix as an input, not a Pearson's correlation matrix, because our data is ordinal. The option `fm = "minres"` implies that we choose minimum residual as a factoring method due to its effectiveness in handling non-normally distributed data [@harmanFactorAnalysisMinimizing1966]. Since we have more than eight response categories, we should instead run an EFA with Pearson's correlation matrix as an input. Therefore, we first need to create a Pearson's correlation matrix from our data frame, and then, run an EFA by calling these following commands:
+
+```{r}
+cor <- cor(rwa, method = "pearson") # First, creating a Pearson's correlation matrix.
+efa <- fa(rwa, nfactors = 1, fm = "minres") # Now, running EFA.
+print(efa) # Print the results.
+```
+
+After calling the commands, readers can find `Proportion Var` in the output, which reflects the amount of variance explained by a latent factor. The variance proportion of our EFA model is 0.56, which means that 56% of the total variance is explained by a latent factor. Since the latent factor can account for more than 50% of the variance, we can reasonably assume that the latent factor underlying our data is unidimensional. To better visualize the Eigenvalues of the EFA, we can draw a scree plot using the following commands:
+
+```{r}
+#| eval: false
+
+plot(efa$values, type = "b", main = "Scree Plot", xlab = "Factor", ylab = "Eigenvalue") # Scree plot
+abline(h = 1, col = "red", lty = 2) # Add new line to eigenvalue = 1.
+```
+
+The first line of code is a function to plot the Eigenvalues (`efa$values`, x-axis) given the number of latent factors (y-axis). The option `type = "b"` implies that we ask R to display the Eigenvalues exact points and a line connecting these points along the number of factors. The second line of code aims to display a horizontal red line (i.e., a reference line) to see which factors have eigenvalues greater than one, which is a common criterion for factor retention. {apafg-fig2} shows that there is a clear break or an "elbow" that displays the location where the Eigenvalues start to level off. This implies that factors beyond the first may not be meaningful and could be only noise. Therefore, the scree plot strengthens our assumption that the item pool is, indeed, unidimensional.
+
+{{< pagebreak >}}
+
+```{r fig2}
+#| output: true
+#| echo: false
+#| label: apafg-fig2
+#| apa-cap: Scree Plot
+#| apa-note: NULL
+
+plot(efa$values, type = "b", main = "Scree Plot", xlab = "Factor", ylab = "Eigenvalue") # Scree plot
+abline(h = 1, col = "red", lty = 2) # Add new line to factor 1.
+
+```
+
+{{< pagebreak >}}
+
+To scrutinize the unidimensionality assumption, we can also run a parallel analysis by running the following command:
+
+```{r}
+pa <- fa.parallel(rwa, nfactors = 1, fm = "minres", fa = "fa")
+```
+
+Readers should find a plot similar to {apafg-fig3} appear right after executing this code as well as a message, which says: `Parallel analysis suggests that the number of factors =  6  and the number of components =  NA`. This means that the parallel analysis suggests that there are six factors underlying our item pool, not one. However, according to {apafg-fig3}, we can see clearly that the Eigenvalues from our actual data fall steeply after the first factor. To paint a clearer picture, we can examine the Eigenvalues of each latent factor estimated by the parallel analysis by running the following command:
+
+```{r}
+pa$fa.values
+```
+
+The output shows that the Eigenvalue for the first factor is much larger than the the adjacent factor (`12.225/0.843`), further supporting the evidence for unidimensionality.
+
+{{< pagebreak >}}
+
+```{r fig3}
+#| output: true
+#| echo: false
+#| label: apafg-fig3
+#| apa-cap: Parallel Analysis
+#| apa-note: NULL
+
+plot(pa)
+```
+
+{{< pagebreak >}}
+
+## Step 4: Model Estimation, Parameters, and Fit Statistics
+
+In this step, we start to specify a vector representing our model, such as:
+
+```{r}
+model <- 'rwa = 1-22'
+```
+
+This code implies that we want to estimate a model with $\theta$ namely `rwa`, and the items representing the $\theta$ are columns 1 to 22 of the data frame that we are going to use in the analysis. Then, we can continue to model fitting by typing the following command:
+
+```{r}
+fit <- mirt(data = rwa, 1, model = model, itemtype = "graded", SE = TRUE, verbose = FALSE)
+```
+
+The code above implies that we are fitting an IRT model using data from a data frame namely `rwa` (`data = rwa`). The number `1` indicates that we assume that the model contains only one $\theta$, i.e., unidimensional. We also set the model specification to `model = model`, which we have previously determined. We set `itemtype` to `"graded"` because we want to run a GRM model. The `SE` option is set to `TRUE` because we ask R to also estimate the standard error. At last, we set the `verbose` option to `FALSE` to avoid R displaying unnecessary information during the model fitting process, so the `mirt()` function can run quietly.
+
+Next, we can ask the package to calculate item discrimination and thresholds by calling these functions below:
+
+```{r}
+coefs <- coef(fit, IRTpars = TRUE, simplify = TRUE) # Saving model parameters (item discrimination (a) and threshold (b)) in a data frame.
+print(coefs) # Calling the data frame.
+summary(fit) # Displaying factor loadings and commonality.
+```
+
+The first line of code indicates that we are calling a `coef()` function to calculate item parameters from `fit` model, and then, store them in a new data frame called `coefs`. The `IRTpars` and `simplify` option is set to `TRUE` because we want to display the traditional IRT parameters (*a* and *b*) in a simple, readable format without showing the standard errors.
+
+The output from this procedure is presented in {apatb-table4}, which shows item discrimination (*a*) of each item and item thresholds (*b1-b8*) of each response category within an item. To interpret *a*, readers can use a rule of thumb suggested by @bakerBasicsItemResponse2017, which categorizes item discrimination exceeding 0.00, 0.35, 0.65, 1.35, and 1.70, as very low, low, moderate, high, and very high. As we see in {apatb-table4}, item discrimination parameters of the RWA scale range from high to very high (1.57 (Q1) to 3.32 (Q7)), suggesting efficient differentiation among individuals at different RWA levels. All threshold parameters show a consistent increase, implying that those with higher RWA levels tend towards a higher response categories. However, *b1* and *b2* for all items are very close to zero, which indicates that individuals with the RWA level around the mean are likely to opt for "*strongly disagree*" or stepping to its adjacent response category. This might suggest that the RWA scale is less sensitive to individuals with a low or very low RWA level.
+
+The third line of code is a function to calculate a factor loading ($\lambda$) and commonality (h^2^) of each item, which are also provided in {apatb-table4}. Before estimating a graded response model, *mirt* ran an EFA, and now as we can see in the console, we are looking at the EFA results. The results are slightly different from our previous EFA analysis, because *mirt* runs EFA using a quasi-polychoric correlation matrix, while the one we ran earlier to test unidimensionality used a Pearson's correlation matrix as an input. However, most importantly, we see that all items are significantly loaded to one factor, and the factor now substantially accounts for 65.1% of the variance in the data, which strengthens our assumption that the RWA scale is unidimensional.
+
+{{< pagebreak >}}
+
+```{r}
+#| include: false
+
+sum <- summary(fit) 
+```
+
+```{r apatb-table4}
+#| output: true
+#| echo: false
+#| apa-cap: Item Parameters
+#| apa-note: a = Discrimination, b1-b8 = Response specific threshold parameters, λ = Standardized Factor Loadings, h2 = Commonality.
+#| ft.align: left
+#| column: page
+
+table3 <- as.data.frame(coefs$items)
+load <- as.data.frame(sum$rotF)
+h2 <- as.data.frame(sum$h2)
+table3 <- cbind(table3, load, h2)
+table3 <- table3 %>% 
+  rownames_to_column(var="Item") %>% 
+  select(Item, a, b1, b2, b3, b4, b5, b6, b7, b8, rwa, h2) %>% 
+  rename(λ=rwa) %>% 
+  flextable() %>% 
+  theme_apa() %>% 
+  line_spacing(part = "all") %>% 
+  padding(padding.top = 5, padding.bottom = 5)
+table3 <- colformat_double(x=table3, j="a", digits = 2)
+table3 <- colformat_double(x=table3, j="b1", digits = 2)
+table3 <- colformat_double(x=table3, j="b2", digits = 2)
+table3 <- colformat_double(x=table3, j="b3", digits = 2)
+table3 <- colformat_double(x=table3, j="b4", digits = 2)
+table3 <- colformat_double(x=table3, j="b5", digits = 2)
+table3 <- colformat_double(x=table3, j="b6", digits = 2)
+table3 <- colformat_double(x=table3, j="b7", digits = 2)
+table3 <- colformat_double(x=table3, j="b8", digits = 2)
+table3
+
+```
+
+{{< pagebreak >}}
+
+Next, we can estimate the model goodness-of-fit (GOF) statistics (*M*~2~) by calling this command below:
+
+```{r}
+M2(fit, type = "C2")
+```
+
+```{r}
+#| include: false
+
+m2_results <- M2(fit, type="C2")
+m2_results[] <- lapply(m2_results, as.numeric)
+m2_stat <- m2_results$M2
+df <- m2_results$df
+rmsea <- m2_results$RMSEA
+rmsea = round(rmsea, digits=3)
+srmsr <- m2_results$SRMSR
+srmsr = round(srmsr, digits=3)
+tli <- m2_results$TLI
+tli = round(tli, digits=3)
+cfi <- m2_results$CFI
+cfi = round(cfi, digits=3)
+```
+
+*mirt* calculates the *M*~2~ statistics [@maydeu-olivaresLimitedInformationGoodnessoffit2006] and other GOF indices, such as Root Mean Square Error of Approximation (RMSEA), Comparative Fit Index (CFI), Tucker-Lewis Index (TLI), and Standardized Root-Mean-Square Residual (SRMSR) after running the code above. Here, we set the `type` option to `"C2"` because it is suitable for computing *M*~2~ statistics in polytomous models. The interpretation of GOF statistics is similar to a general guide for interpreting GOF in CFA or SEM models [@schermelleh-engelEvaluatingFitStructural2003], which are *RMSEA* $\leq$ 0.05, *SRMSR* \< 0.05, *TLI* and *CFI* $\geq$ 0.97.
+
+According to our analysis, the model overall does not fit the data well (*M*~2~(`r df`) = `r m2_stat`, *p* \< .005, *RMSEA* = `r rmsea`, *SRMSR* = `r srmsr`, TLI = `r tli`, CFI = `r cfi`), because there is a significant discrepancy between response patterns predicted by the model with the data, as shown by significant *M*~2~ statistics. All GOF statistics, except for CFI, do not indicate a good fit. Model misfit, in this case, may be caused by local dependency between the items. We will explore this issue further in the next part.
+
+Next, we calculate item-level fit statistics, i.e., the signed \$\\chi\$^2^ statistics, by running the following function:
+
+```{r}
+item.fit <- itemfit(fit) # Estimating item fit statistics and saving them in a data frame.
+print(item.fit) # Calling the data frame.
+```
+
+The output of this function is provided in {apatb-table5}, which shows fit statistics for an individual item. All items have very good (low) *RMSEA* values but normally, we want the *p* values of the signed \$\\chi\$^2^ to be nonsignificant (*p* \> .05), implying that there is no discrepancy between the observed response pattern with what the model predicts. In {apatb-table5}, only three items here are nonsignificant (Q2, Q4, and Q12), which strengthens our suspicion that the RWA items might not be locally independent.
+
+{{< pagebreak >}}
+
+```{r apatb-table5}
+#| output: true
+#| echo: false
+#| apa-cap: Item Fit Statistics
+#| apa-note: Signed χ2 Statistics. RMSEA = Root Mean Square Error of Approximation, CFI = Comparative Fit Index, TLI = Tucker-Lewis Index, SRMR = Standardized Root Mean Square Residual.
+#| ft.align: left
+
+table4 <- as.data.frame(item.fit)
+table4 <- table4 %>%
+  select(item, S_X2, df.S_X2, RMSEA.S_X2, p.S_X2) %>% 
+  rename(Item=item, χ2=S_X2, df=df.S_X2, RMSEA=RMSEA.S_X2, p=p.S_X2) %>% 
+  flextable() %>% 
+  theme_apa() %>% 
+  line_spacing(part = "all") %>% 
+  padding(padding.top = 5, padding.bottom = 5)
+table4 <- colformat_double(x=table4, j="χ2", digits = 2)
+table4 <- colformat_double(x=table4, j="df", digits = 2)
+table4 <- colformat_double(x=table4, j="RMSEA", digits = 2)
+table4 <- colformat_double(x=table4, j="p", digits = 2)
+table4
+
+```
+
+{{< pagebreak >}}
+
+## Step 5: Model Residuals
+
+To ensure that the items are locally independent, *mirt* offers several alternatives to examine the behavior of residuals. First, we demonstrate how to run Local Dependency (LD) \$\\chi\$^2^ statistics [@chenLocalDependenceIndexes1997], which looks at the covariance between item pairs after accounting for $\theta$. In this tutorial, we demonstrate the use of Yen's *Q*~3~ statistics [@yenEffectsLocalItem1984], which is considered more powerful for detecting underlying local dependency than LD \$\\chi\$^2^ statistics [@chenLocalDependenceIndexes1997]. To run Yen's *Q*~3~, readers can type and run this command:
+
+```{r}
+q3 <- residuals(fit, type = "Q3") # Running Yen's Q3 statistics.
+```
+
+This code asks R to run `residuals()` function using `"Q3"` as the `type`, and then, keep the value as a new matrix, namely `q3`. Again, we are only interested in item pairwise correlations above \|0.2\|, and to help us flag problematic pairs, we can make use of `findCorrelation()` function from *caret* package [@kuhnCaretClassificationRegression2024] as follows:
+
+```{r}
+findCorrelation(q3, cutoff = 0.2, verbose = T) # Flagging problematic item pairwise correlations.
+```
+
+After running the code, readers may see in their R console that residual correlations between item Q3, Q4, Q5, Q7, Q11, Q13, Q14, Q18, Q19, and Q21 are above \|0.2\|. Interestingly, all of those items, except for Q4, have significant *S*-\$\\chi\$^2^ statistics (see {apatb-table5}) as well, which tells us that we have to look at these items closely and then decide whether these items have shared characteristics beyond what is explained by the model.
+
+## Step 6: IRT Plots
+
+*mirt* offers features to visualize model parameters but the options for customizing these plots are rather limited. *ggmirt* package [@masurGgmirt2023] fills this gap by combining *mirt* and *ggplot2* functions. In this tutorial, we demonstrate the use of *ggmirt* to visualize Item Probability Function (IPF), Item Information Function (IIF), Test Information Function (TIF), and conditional probability plot.
+
+To visualize IPF, readers can type and run this function:
+
+```{r}
+tracePlot(fit, title = "Item Probability Functions of RWA Scale") + labs(color="Response Categories")
+```
+
+The `labs(color)` function is to assign different colors to each curve representing a response category. The output of this function is {apafg-fig4}. In {apafg-fig4}, we see that as $\theta$ increases, respondents are more likely to choose higher response categories. The gradual transition from one response option to the next across the spectrum of $\theta$ values indicates that the items are capturing incremental increases in the RWA level. However, all IPFs of RWA items seem to be significantly overlapping and tend to peak on a $\theta$ value close to or higher than the mean. This implies that RWA items are more sensitive to differentiate participants with high levels of RWA.
+
+{{< pagebreak >}}
+
+```{r fig4}
+#| output: true
+#| echo: false
+#| label: apafg-fig4
+#| apa-cap: Item Probability Functions of RWA Scale
+#| apa-note: NULL
+
+tracePlot(fit, facet=T, title = "Item Probability Functions of RWA Scale") + labs(color="Response Options")
+```
+
+{{< pagebreak >}}
+
+To evaluate the performance of each item in measuring the RWA trait, we can visualize the amount of information explained by each item with this simple line of code:
+
+```{r}
+itemInfoPlot(fit, facet = TRUE, title = "Item Information Functions of the RWA Scale")
+```
+
+The `facet` option is set to `TRUE` so that R displays IIF for each item. The output for this function is {apafg-fig5}, where the x-axis represents the range of $\theta$, and the y-axis indicates the amount of information provided by each item. Peaks that are higher and narrower indicate items that are very informative for specific levels of $\theta$. In our case, most items provide the highest amount of information near the center to the right side of the $\theta$ distribution, indicating they are most useful for individuals with average to high levels of RWA.
+
+{{< pagebreak >}}
+
+```{r fig5}
+#| output: true
+#| echo: false
+#| label: apafg-fig5
+#| apa-cap: Item Information Curves of the RWA Scale
+#| apa-note: NULL
+
+itemInfoPlot(fit, facet=T, title = "Item Information Curves of the RWA Scale")
+```
+
+{{< pagebreak >}}
+
+It is also possible to evaluate the overall performance of the RWA scale by plotting a TIF, which can be done by running the following code:
+
+```{r}
+testInfoPlot(fit, title = "Test Information Function of the RWA Scale")
+```
+
+The output of this code is {apafg-fig6}, and according to this, the RWA scale as a whole is informative for measuring a group of individuals with a wide range of RWA levels, i.e., between -2*SD* to +4*SD*. However, the RWA scale is not optimal for measuring individuals with RWA levels below or beyond this range.
+
+{{< pagebreak >}}
+
+```{r fig6}
+#| output: true
+#| echo: false
+#| label: apafg-fig6
+#| apa-cap: Test Information Curve of the RWA Scale
+#| apa-note: NULL
+
+testInfoPlot(fit, title="Test Information Curve of the RWA Scale")
+```
+
+{{< pagebreak >}}
+
+## Step 7: Computing Reliability
+
+The heart of an IRT analysis is to estimate the precision of the measure, which can vary given different levels of $\theta$. *mirt* provides two strategies to compute reliability that differ in their assumption regarding the distribution of $\theta$. First, readers may calculate marginal reliability by running this simple command:
+
+```{r}
+marginal_rxx(fit)
+```
+
+```{r}
+#| include: false
+
+m_rel <- marginal_rxx(fit)
+m_rel = round(m_rel, digits=3)
+```
+
+The output of the above code is `r m_rel`, which indicates that the overall RWA scale is reliable, assuming that the underlying $\theta$ distribution follows the Gaussian or normal distribution [@chalmersAnswerDifferenceEmpirical2019]. Since reliability can vary across different levels of $\theta$, readers can also visualize the scale's reliability given the levels of $\theta$ by running the function of *ggmirt* package, as follows:
+
+```{r}
+conRelPlot(fit, title = "Reliability of the RWA Scale Given to the θ Level")
+```
+
+The output of this code is {apafg-fig7}, which shows that the RWA scale can measure individuals with $\theta$ levels between -2*SD* and +4*SD* with sufficient reliability, i.e., *r*~xx~ $\geq$ 0.75.
+
+{{< pagebreak >}}
+
+```{r fig7}
+#| output: true
+#| echo: false
+#| label: apafg-fig7
+#| apa-cap: Reliability of the RWA Scale Given to the θ Level
+#| apa-note: NULL
+
+conRelPlot(fit, title="Reliability of the RWA Scale Given to the θ Level")
+```
+
+{{< pagebreak >}}
+
+*mirt* can also calculate the RWA scale overall reliability using $\theta$ predicted by the model. To compute empirical reliability, one needs to calculate the estimated $\theta$ value of each participant first, and then, calculate reliability based on these values. To do this, readers can run these two lines of codes:
+
+```{r}
+theta_se <- fscores(fit, full.scores.SE = TRUE) # Extracting the estimated theta score of each participant.
+empirical_rxx(theta_se) # Then use the estimated theta to calculate empirical reliability.
+```
+
+```{r}
+#| include: false
+
+e_rel <- empirical_rxx(theta_se)
+e_rel = round(e_rel, digits=3)
+```
+
+The `fscores()` function is used to compute the estimated $\theta$ value for each participant predicted by the `fit` model. The `full.scores.SE` is set to `TRUE` because the package uses the $\theta$ value and standard error of each participant (*SE*$\theta$) to compute the empirical reliability. We store the estimated $\theta$ and its *SE*$\theta$ in a new data frame, namely `theta_se`, and then run `empirical_rxx()` function to calculate empirical reliability. The output of these codes is `r e_rel`, which is very close to marginal reliability we estimated before. Notably, while marginal and empirical reliability aim to quantify the overall reliability of the scale, they base the calculations on different assumptions. To summarize, marginal reliability assumes that $\theta$ is normally distributed while empirical reliability uses the $\theta$ distribution predicted by the model, which still contains measurement error yet more realistic.
+
+# Discussion
+
+Construct validation is an ongoing process [@messickValidityPsychologicalAssessment1995], so reporting evidence of validity should always be an important part of the routine. In practice, however, researchers are less interested in examining the performance of the measures they use in their study, making it difficult to assess the credibility of their research findings [@flakeConstructValidationSocial2017; @husseyHiddenInvalidity152020]. In this tutorial, we demonstrate the applicability of GRM analysis as part of the IRT family to help applied psychology researchers assess their measurement quality. We provide a non-technical guide to implementing a GRM analysis through a simple 7-step process using a real, openly available dataset. To maximize the effectiveness of this tutorial, we show how to perform a GRM analysis using R [@rcoreteamLanguageEnvironmentStatistical2023], an open source statistical software, and make all materials publicly available.
+
+We begin the tutorial with a theoretical overview of IRT, which underlies GRM, so that readers can relate the practical steps to the theory behind the analysis. Since IRT is less popular than CTT, we also briefly explain how IRT differs from CTT in its assumptions. However, we want to emphasize that our goal here is not to argue for the superiority of CTT over IRT, since the choice of analytic tool depends largely on the specific research question at hand. It is important to highlight that researchers should be aware of the merits and limitations of their chosen methods. Therefore, researchers should always justify why they choose a particular method over many available alternatives.
+
+Note that the model we estimated has a poor fit, perhaps due to local dependency, as we showed in steps 4 and 5. In practice, we recommend addressing model fitting issues before interpreting measurement precision or drawing substantive conclusions based on these estimates. One solution is to rephrase or to combine the content of the problematic items that indicate local dependency. Alternatively, readers may need to reconsider the $\theta$ structure. If the data is unidimensional but some of the items are locally dependent, this may indicate the existence of multiple $\theta$ within the data structure. In this sense, modeling the test data as a correlated multidimensional model or a bifactor model (i.e., multidimensional models with a *g* factor) may be a solution, given that a previous study shows that the RWA scale is multidimensional [@duckittMultidimensionalityRightWingAuthoritarian2013]. Removing locally dependent items should be a last resort, as it may improve model fit but may also compromise measurement precision.
+
+Finally, we support the call for psychological researchers to shift their focus from improving their methodological practices to advancing the process of theory building [@eronenTheoryCrisisPsychology2021; @grahekAnatomyPsychologicalTheory2021; @proulxStatisticalRitualTheory2021], because formulating a sound theory always precedes the creation of a high-quality psychological measure. It is important to note, however, that construct validation is a critical step in the iterative process of theorizing a psychological phenomenon [@grahekAnatomyPsychologicalTheory2021]. Therefore, we encourage applied psychology researchers to report evidence of measurement quality to ensure the validity of their findings and contribute to cumulative psychological science [@floraPurposePracticeExploratory2017]. One way to do this is to conduct and report a GRM analysis of their measures. We hope that this tutorial can be seen as a small step towards the larger goal of building robust psychological science.
+
+{{< pagebreak >}}
+
+# References
+
+::: {#refs}
+:::
