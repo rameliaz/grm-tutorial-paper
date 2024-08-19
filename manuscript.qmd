@@ -177,7 +177,45 @@ library(mirt); library(ggmirt); library(psych); library(tidyverse); library(care
 Now after the packages are activated, we need to import the dataset to our R environment. The cleaned dataset (`data.csv`) and code book (`codebook.txt`) are available in `data` folder in our repository. Readers can download them from our repository and then simply import the dataset with the following command:
 
 ```{r}
+<<<<<<< HEAD
 #| eval: false
+=======
+describe(rwa)
+```
+
+This command summarizes key descriptive statistics of a data frame, and the summary is provided in {apatb-table2}. As we see in {apatb-table2}, all variables have a minimum value of `0`, while the minimum score should be `1`.
+
+{{< pagebreak >}}
+
+```{r apatb-table2}
+#| output: true
+#| echo: false
+#| apa-cap: Descriptive Statistics of RWA Scale
+#| apa-note: SD = Standard Deviation
+#| ft.align: left
+
+# Transforming describe() output into a APA-formatted table
+rwa <- subset(ds, select = Q1:Q22)
+table2 <- psych::describe(rwa); table2 <- as.data.frame(table2)
+table2 <- table2 %>% 
+  rownames_to_column(var="Item") %>% 
+  select(Item, mean, sd, min, max, range, n) %>% 
+  rename(Mean=mean, SD=sd, Minimum=min, Maximum=max, Range=range) %>% 
+  flextable() %>%
+  theme_apa() %>% 
+  line_spacing(part = "all") %>% 
+  padding(padding.top = 5, padding.bottom = 5)
+table2 <- colformat_double(x=table2, j="Minimum", digits = 0)
+table2 <- colformat_double(x=table2, j="Maximum", digits = 0)
+table2 <- colformat_double(x=table2, j="Range", digits = 0)
+table2 <- colformat_double(x=table2, j="n", digits = 0)
+table2
+```
+
+{{< pagebreak >}}
+
+Again, there is no information provided in the codebook regarding what `0` actually represents. Therefore, before deciding what we should do next, it is better to find out how many `0` we have in the data frame. To this end, we can calculate the percentage of `0` in each item by running these commands:
+>>>>>>> 371313d05e181682871311828896e9d0b0badea4
 
 data <- read.csv("path_to_data/data.csv") # Replace "path_to_data" with the actual path to your data file
 ```
@@ -191,7 +229,31 @@ Next, we show the readers the ways of testing unidimensionality. This step is im
 ```{r}
 #| eval: false
 
+<<<<<<< HEAD
 irt.fa(data, nfactors = 1, fm = "minres")
+=======
+rwa <- rwa %>%
+  mutate_all(~na_if(., 0)) %>%  # Replacing 0 with NA in all columns.
+  drop_na()  # Removing cases with any NA values.
+unfav <- c("Q4","Q6","Q8","Q9","Q11","Q13","Q15","Q18","Q20","Q21") # Now we create a vector defining which items will be coded reversely.
+rwa <- rwa %>% 
+  mutate(across(all_of(unfav), ~ 10 - .))# We simply subtract the scores from 9 (the maximum) to reverse code the unfavorable items.
+# Transforming describe() output into a APA-formatted table
+table3 <- psych::describe(rwa); table3 <- as.data.frame(table3)
+table3 <- table3 %>% 
+  rownames_to_column(var="Item") %>% 
+  select(Item, mean, sd, min, max, range, n) %>% 
+  rename(Mean=mean, SD=sd, Minimum=min, Maximum=max, Range=range) %>% 
+  flextable() %>% 
+  theme_apa() %>% 
+  line_spacing(part = "all") %>% 
+  padding(padding.top = 5, padding.bottom = 5)
+table3 <- colformat_double(x=table3, j="Minimum", digits = 0)
+table3 <- colformat_double(x=table3, j="Maximum", digits = 0)
+table3 <- colformat_double(x=table3, j="Range", digits = 0)
+table3 <- colformat_double(x=table3, j="n", digits = 0)
+table3
+>>>>>>> 371313d05e181682871311828896e9d0b0badea4
 ```
 
 `irt.fa()` function is to run an EFA with a polychoric correlation matrix as an input when the data are ordinal, which is often the case in practice, especially when researchers are working with a five-option Likert scale. Since we have more than eight response categories in our current dataset, after running `irt.fa()` function, an error message, "*polychoric is probably not needed*", should appear in the console. Therefore, another option would be running an EFA manually with a correlation matrix as an input. To determine which correlation method should be used when constructing the correlation matrix, we need to check whether items are normally distributed by calling this command:
@@ -299,11 +361,19 @@ sum <- summary(fit)
 #| ft.align: left
 #| column: page
 
+<<<<<<< HEAD
 table2 <- as.data.frame(coefs$items)
 load <- as.data.frame(sum$rotF)
 h2 <- as.data.frame(sum$h2)
 table2 <- cbind(table2, load, h2)
 table2 <- table2 %>% 
+=======
+table4 <- as.data.frame(coefs$items)
+load <- as.data.frame(sum$rotF)
+h2 <- as.data.frame(sum$h2)
+table4 <- cbind(table4, load, h2)
+table4 <- table4 %>% 
+>>>>>>> 371313d05e181682871311828896e9d0b0badea4
   rownames_to_column(var="Item") %>% 
   select(Item, a, b1, b2, b3, b4, b5, b6, b7, b8, theta, h2) %>% 
   rename(λ=theta) %>% 
@@ -311,6 +381,7 @@ table2 <- table2 %>%
   theme_apa() %>% 
   line_spacing(part = "all") %>% 
   padding(padding.top = 5, padding.bottom = 5)
+<<<<<<< HEAD
 table2 <- colformat_double(x=table2, j="a", digits = 2)
 table2 <- colformat_double(x=table2, j="b1", digits = 2)
 table2 <- colformat_double(x=table2, j="b2", digits = 2)
@@ -321,6 +392,18 @@ table2 <- colformat_double(x=table2, j="b6", digits = 2)
 table2 <- colformat_double(x=table2, j="b7", digits = 2)
 table2 <- colformat_double(x=table2, j="b8", digits = 2)
 table2
+=======
+table4 <- colformat_double(x=table4, j="a", digits = 2)
+table4 <- colformat_double(x=table4, j="b1", digits = 2)
+table4 <- colformat_double(x=table4, j="b2", digits = 2)
+table4 <- colformat_double(x=table4, j="b3", digits = 2)
+table4 <- colformat_double(x=table4, j="b4", digits = 2)
+table4 <- colformat_double(x=table4, j="b5", digits = 2)
+table4 <- colformat_double(x=table4, j="b6", digits = 2)
+table4 <- colformat_double(x=table4, j="b7", digits = 2)
+table4 <- colformat_double(x=table4, j="b8", digits = 2)
+table4
+>>>>>>> 371313d05e181682871311828896e9d0b0badea4
 
 ```
 
@@ -354,7 +437,11 @@ cfi = round(cfi, digits=3)
 
 According to our analysis, the model does not fit the data well (*M*~2~(`r df`) = `r m2_stat`, *p* \< .001, *RMSEA* = `r rmsea`, *SRMSR* = `r srmsr`, TLI = `r tli`, CFI = `r cfi`), because there is a significant discrepancy between response patterns predicted by the model with the data, as shown by significant *M*~2~ statistics. When faced with this situation, readers are advised to tentatively reject the model and then identify the sources and magnitude of the misfit [@klinePrinciplesPracticeStructural2023; @liuIdentifyingSourceMisfit2014]. It is likely that a model fails the $\chi$ ^2^ test, but the residuals show an insignificant discrepancy between the observed and expected values when we have a very large sample [@klinePrinciplesPracticeStructural2023; @maydeu-olivaresEvaluatingFitIRT2015], which may well be the case since we have more than 9,000 cases in our dataset.
 
+<<<<<<< HEAD
 Overall, our model is neither a poorly fit nor a good fit. RMSEA shows a poor fit, while CFI and TLI indicate a good fit. However, the most important goodness-of-fit statistics we should pay attention to is SRMSR, since it provides the average effect size of model misfit [@maydeu-olivaresEvaluatingFitIRT2015]. SRMSR is only slightly above the `0.05` cutoff, suggesting that some areas of our model may be misfitting, but the misfit is not so severe. With this in mind, it is noteworthy to identify the source of the misfit, and local dependency between items is the main suspect.
+=======
+According to our analysis, the model overall does not fit the data well (*M*~2~(`r df`) = `r m2_stat`, *p* \< .05, *RMSEA* = `r rmsea`, *SRMSR* = `r srmsr`, TLI = `r tli`, CFI = `r cfi`), because there is a significant discrepancy between response patterns predicted by the model with the data, as shown by significant *M*~2~ statistics. All GOF statistics, except for CFI, do not indicate a good fit. Model misfit, in this case, may be caused by local dependency between the items. We will explore this issue further in the next part.
+>>>>>>> 371313d05e181682871311828896e9d0b0badea4
 
 Next, we calculate item-level fit statistics, i.e., the signed $\chi$ ^2^ statistics, by running the following function:
 
@@ -374,19 +461,34 @@ The output of this function is provided in {apatb-table3}, which shows that the 
 #| apa-note: Signed χ2 Statistics. RMSEA = Root Mean Square Error of Approximation, CFI = Comparative Fit Index, TLI = Tucker-Lewis Index, SRMR = Standardized Root Mean Square Residual.
 #| ft.align: left
 
+<<<<<<< HEAD
 table3 <- as.data.frame(itemfit(fit))
 table3 <- table3 %>%
   select(item, S_X2, df.S_X2, p.S_X2, RMSEA.S_X2) %>% 
   rename(Item=item, Sχ2=S_X2, df=df.S_X2, p=p.S_X2, RMSEA=RMSEA.S_X2) %>% 
+=======
+table5 <- as.data.frame(itemfit(fit))
+table5 <- table5 %>%
+  select(item, S_X2, df.S_X2, RMSEA.S_X2, p.S_X2) %>% 
+  rename(Item=item, Sχ2=S_X2, df=df.S_X2, RMSEA=RMSEA.S_X2, p=p.S_X2) %>% 
+>>>>>>> 371313d05e181682871311828896e9d0b0badea4
   flextable() %>% 
   theme_apa() %>% 
   line_spacing(part = "all") %>% 
   padding(padding.top = 5, padding.bottom = 5)
+<<<<<<< HEAD
 table3 <- colformat_double(x=table3, j="Sχ2", digits = 2)
 table3 <- colformat_double(x=table3, j="df", digits = 0)
 table3 <- colformat_double(x=table3, j="p", digits = 4)
 table3 <- colformat_double(x=table3, j="RMSEA", digits = 3)
 table3
+=======
+table5 <- colformat_double(x=table5, j="Sχ2", digits = 2)
+table5 <- colformat_double(x=table5, j="df", digits = 0)
+table5 <- colformat_double(x=table5, j="RMSEA", digits = 3)
+table5 <- colformat_double(x=table5, j="p", digits = 3)
+table5
+>>>>>>> 371313d05e181682871311828896e9d0b0badea4
 
 ```
 
