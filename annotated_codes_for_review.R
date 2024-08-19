@@ -1,12 +1,17 @@
-# Tutorial on running a Graded Response Model, initiated on 09.11.2023
+# Tutorial on running a Graded Response Model, revised on 06.08.2024
 
 # Welcome to the tutorial!  ------
 # This tutorial aims to familiarize applied psychological researchers to item response theory (IRT) modeling, 
 # or more specifically, a graded response model (GRM). GRM is a part of IRT family, specifically designed for
 # examining the performance of a scale with polytomous responses (Likert-type scale).
 
-# To this end, we will show you how to run a GRM, using data from the Open Psychometric Database, specifically 
+# To this end, in the first part, we will show you how to run a GRM, using data from the Open Psychometric Database, specifically 
 # the right-wing authoritarianism (RWA) scale (Altemeyer). 
+
+# And in the second part, we will show you how to run a GRM using a simulated dataset.
+# To optimally use this material, we strongly recommend to go through the first part (RWA) and then the second part (simulated data).
+
+##### THE FIRST PART: RWA SCALE ----
 
 ## Step 1a: Preparation - Install and activate the packages ##  ------
 
@@ -301,6 +306,37 @@ omega(rwa) # This script computes several reliability coefficients
 # As we see here, the RWA scale is internally consistent.
 
 om <- omega(rwa)
+
+
+
+##### THE SECOND PART: SIMULATED DATASET ----
+
+# To give readers a clearer picture of the implementation of GRM, in the second part, we would like to demonstrate 
+# how to simulate a dataset using `simdata()` function in `mirt` package. 
+# We will simulate a dataset which contains RWA so that readers can compare the first and the second part.
+# Simulating a data set should always start with specifying the parameters, and to that end, let's use the parameters
+# that we have estimated in the first part.
+
+
+## Step 1: Simulate the dataset using `mirt` package ## ----
+
+sim_data <- simdata(model=fit, N=800); sim_data <- as.data.frame(sim_data)
+
+sim_model <- 'rwa=1-22'
+
+fit_sim <- mirt(data=sim_data, 1, model=model, itemtype="graded", SE=T, verbose=F)
+
+summary(fit_sim)
+
+itemfit(fit_sim)
+
+M2(fit_sim, type="C2")
+
+## Step 2: Examining dimensionality ## ----
+## Step 3: Model estimation, parameters, and fit statistics ## ----
+## Step 4: Inspecting residuals ## ----
+## Step 5: Plots (item characteristics curve, item information curve, and test information curve) ## ----
+## Step 6: Computing reliability ## ----
 
 # Session Info ------
 sessionInfo()
