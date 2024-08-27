@@ -1,6 +1,6 @@
 ---
 title: "Tutorial on running a Graded Response Model"
-author: "Rizqy Amelia Zein & Hanif Akhtar"
+author: "Anonymized Authors"
 date: "`r Sys.Date()`"
 output: html_document
 ---
@@ -498,11 +498,9 @@ conRelPlot(fit_sim, title="Reliability of the Simulated Dataset Given to the θ 
 
 The simulated data shows the same pattern as the real one, which shows that the scale as a whole is optimal (having sufficient reliability, \~0.8) for measuring participants with $\theta$ levels between -2SD and +4SD.
 
-## Contact
-
 Thank you for getting through this tutorial until the very end! We hope that this tutorial is useful!
 
-If you have any feedback or questions, please get in touch and let us know by email here: [Amelia.Zein\@psy.lmu.de](mailto:Amelia.Zein@psy.lmu.de?subject=GRM%20Tutorial), [amelia.zein\@psikologi.unair.ac.id](mailto:amelia.zein@psikologi.unair.ac.id?subject=GRM%20Tutorial), or [hanifakhtar\@umm.ac.id](mailto:hanifakhtar@umm.ac.id?subject=GRM%20Tutorial).
+If you have any feedback, please get in touch and let us know by email here: [email anonymized].
 
 # Session Info
 
