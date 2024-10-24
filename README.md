@@ -1,7 +1,8 @@
 ## Getting Started with the Graded Response Model
+
 ### An introduction and tutorial in R
 
-In this tutorial paper, we aim to familiarize applied psychology researchers to the graded response model, a family of Item Response Theory (IRT) model, specifically designed to estimate measurement precision for polytomous ordinal (Likert) scales. 
+In this tutorial paper, we aim to familiarize applied psychology researchers to the graded response model, a family of Item Response Theory (IRT) model, specifically designed to estimate measurement precision for polytomous ordinal (Likert) scales.
 
 We keep all the materials related to the tutorial paper in this repository.
 
@@ -11,18 +12,17 @@ Manuscript is fully reproducible, written by [APA template for Quarto](https://g
 
 ### Supplementary Material
 
-We include an annotated R Markdown file as a complement to the manuscript. For didactic purpose, please use this instead. [Click here to download]().
+We include an annotated R Markdown file as a complement to the manuscript. For didactic purpose, please use this instead. [Click here to download](https://github.com/rameliaz/grm-tutorial-paper/blob/main/annotated_codes.Rmd).
 
 ### Citation
 
 Please cite our tutorial as follows:
 
-  Zein, R.A. & Akhtar, H. (2024). Getting Started with the Graded Response Model (GRM): 
-  An introduction and tutorial in R. *International Journal of Psychology*, *Advance online publication*.
-  https://doi.org/
+> Zein, R.A. & Akhtar, H. (2024). Getting Started with the Graded Response Model (GRM): An introduction and tutorial in R. *International Journal of Psychology*, *Advance online publication*. <https://doi.org/>
 
 A BibTeX entry for LaTeX users is
 
+``` r
   @Article{,
     doi = {},
     url = {},
@@ -35,3 +35,4 @@ A BibTeX entry for LaTeX users is
     title = {{Getting Started with the Graded Response Model: An introduction and tutorial in R}},
     journal = {{International Journal of Psychology}},
   }
+```
