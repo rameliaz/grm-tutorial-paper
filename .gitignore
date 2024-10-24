@@ -2,3 +2,8 @@
 .Rhistory
 .RData
 .Ruserdata
+manuscript
+annotated_codes.R
+annotated_codes_for_blind_review.Rmd
+annotated_codes_for_review.R
+manuscript.docx
