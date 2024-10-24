@@ -36,7 +36,7 @@ keywords:
 author-note:
   disclosures:
     conflict-of-interest: "We declare that we have no competing interests."
-    financial-support: "The first author receives a PhD scholarship from the German Academic Exchange Service (Deutscher Akademischer Austauschdienst, DAAD), award number 91803023."
+    financial-support: "The first author receives a PhD scholarship from the German Academic Exchange Service (Deutscher Akademischer Austauschdienst, DAAD), award number 91803023, and thanks DAAD for its financial support."
 lang: en
 bibliography: references.bib
 format:
@@ -94,7 +94,7 @@ Further, IRT paradigm has rapidly developed to include various models suited to 
 ```
 
 | Model                       | Key Characteristics                                                                                                                                                                                                                                          | Data Type   | Response Options        |
-|------------|-------------------------------------|------------|------------|
+|-----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------|-------------------------|
 | 1-PL Model (Rasch Model)    | 1\. Estimates only item difficulties (*b*). 2. Assumes that all items have equal discrimination parameters (*a*). 3. Item and person parameters are independent.                                                                                             | Dichotomous | Correct/Incorrect (0/1) |
 | 2-PL Model                  | 1\. Estimates item difficulties (*b*) and item discrimination (*a*). 2. Less stringent than 1-PL model since it allows item discrimination parameters (*a*) to vary.                                                                                         | Dichotomous | Correct/Incorrect (0/1) |
 | 3-PL Model                  | 1\. Estimates item difficulties (*b*), discrimination (*a*), and pseudo-guessing parameter (*c*). 2. Appropriate for modeling a test data with multiple responses (e.g., multiple-choice tests), and thus, guessing might influence participants' responses. | Dichotomous | Correct/Incorrect (0/1) |
@@ -146,11 +146,11 @@ In this paper, we use the most recent version of the RWA scale [@altemeyerAuthor
 
 # Disclosure and Data Availability Statements
 
-To maximize the reproducibility of our illustrative example, we wrote the article as a Quarto (.qmd) document, where we integrate the R codes used in the analysis as well as its outputs. We also include a longer, annotated R Markdown file (.Rmd) for the example we used as a supplementary document, which we highly recommend using for a didactic purpose. In the same file, we also include a part where we demonstrate the application of GRM using a simulated dataset, which we do not include in the article, so that readers can compare the example we present here against an ideal scenario. The Quarto file (and its corresponding .docx and .pdf output) and an annotated R Markdown file are publicly available on [a Github repository]() (*unlinked for blind review*). The dataset we used in this tutorial paper was obtained from a publicly accessible [Open-Source Psychometrics Project](http://openpsychometrics.org/_rawdata/).
+To maximize the reproducibility of our illustrative example, we wrote the article as a Quarto (.qmd) document [@schneiderWjschneApaquarto2024], where we integrate the R codes used in the analysis as well as its outputs. We also include a longer, annotated R Markdown file (.Rmd) for the example we used as a supplementary document, which we highly recommend using for a didactic purpose. In the same file, we also include a part where we demonstrate the application of GRM using a simulated dataset, which we do not include in the article, so that readers can compare the example we present here against an ideal scenario. The Quarto file (and its corresponding .docx and .pdf output) and an annotated R Markdown file are publicly available on [a Github repository](https://github.com/rameliaz/grm-tutorial-paper). The dataset we used in this tutorial paper was obtained from a publicly accessible [Open-Source Psychometrics Project](http://openpsychometrics.org/_rawdata/).
 
 ## Step 1: Data Preparation
 
-Before running the analysis, we need to install the necessary R packages, which are, *mirt* [@chalmersMirtMultidimensionalItem2023a; @chalmersMirtMultidimensionalItem2012], *psych* [@revellePsychProceduresPsychological2023], *ggmirt* [@masurGgmirt2023], and *caret* [@kuhnCaretClassificationRegression2024], and *skimr* [@waringSkimrCompactFlexible2024] with these following commands:
+Before running the analysis, we need to install the necessary R packages, which are, *mirt* [@chalmersMirtMultidimensionalItem2012], *psych* [@revellePsychProceduresPsychological2023], *ggmirt* [@masurGgmirt2023], and *caret* [@kuhnCaretClassificationRegression2024], and *skimr* [@waringSkimrCompactFlexible2024] with these following commands:
 
 ```{r}
 #| eval: false
