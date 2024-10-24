@@ -27,11 +27,11 @@ A BibTeX entry for LaTeX users is
     doi = {},
     url = {},
     year = {2024},
-    publisher = {{The International Journal of Psychology}},
+    publisher = {{Wiley}},
     volume = {},
     number = {},
     pages = {},
-    author = {Zein, Rizqy Amelia AND Akhtar, hanif},
+    author = {Zein, Rizqy Amelia AND Akhtar, Hanif},
     title = {{Getting Started with the Graded Response Model: An introduction and tutorial in R}},
     journal = {{International Journal of Psychology}},
   }
