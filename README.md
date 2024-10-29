@@ -6,7 +6,7 @@ In this tutorial paper, we aim to familiarize applied psychology researchers to 
 
 We keep all the materials related to the tutorial paper in this repository.
 
-Manuscript is fully reproducible, written by [APA template for Quarto](https://github.com/wjschne/apaquarto).
+Manuscript is fully reproducible, written in [APA template for Quarto](https://github.com/wjschne/apaquarto).
 
 [Click here](https://github.com/rameliaz/grm-tutorial-paper/archive/refs/heads/main.zip) to download the repository and reproduce the paper.
 
