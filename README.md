@@ -18,13 +18,13 @@ We include an annotated R Markdown file as a complement to the manuscript. For d
 
 Please cite our tutorial as follows:
 
-> Zein, R.A. & Akhtar, H. (2024). Getting Started with the Graded Response Model (GRM): An introduction and tutorial in R. *International Journal of Psychology*, *Advance online publication*. <https://doi.org/>
+> Zein, R.A. & Akhtar, H. (2024). Getting Started with the Graded Response Model (GRM): An introduction and tutorial in R. *International Journal of Psychology*, *Advance online publication*. <https://doi.org/10.1002/ijop.13265>
 
 A BibTeX entry for LaTeX users is
 
 ``` r
   @Article{,
-    doi = {},
+    doi = {10.1002/ijop.13265},
     url = {},
     year = {2024},
     publisher = {{Wiley}},
