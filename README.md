@@ -18,7 +18,7 @@ We include an annotated R Markdown file as a complement to the manuscript. For d
 
 Please cite our tutorial as follows:
 
-> Zein, R.A. & Akhtar, H. (2024). Getting Started with the Graded Response Model (GRM): An introduction and tutorial in R. *International Journal of Psychology*, *Advance online publication*. <https://doi.org/10.1002/ijop.13265>
+> Zein, R.A. & Akhtar, H. (2025). Getting Started with the Graded Response Model (GRM): An introduction and tutorial in R. *International Journal of Psychology*, *60*(1), e13265. <https://doi.org/10.1002/ijop.13265>
 
 A BibTeX entry for LaTeX users is
 
@@ -26,7 +26,7 @@ A BibTeX entry for LaTeX users is
   @Article{,
     doi = {10.1002/ijop.13265},
     url = {https://onlinelibrary.wiley.com/doi/abs/10.1002/ijop.13265},
-    year = {2024},
+    year = {2025},
     publisher = {{Wiley}},
     volume = {60},
     number = {1},
