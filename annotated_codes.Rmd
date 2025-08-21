@@ -41,7 +41,6 @@ Package `ggmirt` is not available in CRAN, so we have to do a remote installatio
 
 ```{r, include=FALSE}
 devtools::install_github("masurp/ggmirt") # remote ggmirt installation through GitHub repository
-devtools::install_github("masurp/ggmirt")
 ```
 
 Now, we activate the package.
