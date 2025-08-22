@@ -10,6 +10,8 @@ Manuscript is fully reproducible, written in [APA template for Quarto](https://g
 
 [Click here](https://github.com/rameliaz/grm-tutorial-paper/archive/refs/heads/main.zip) to download the repository and reproduce the paper.
 
+We complement the repository with `renv()` so to fully reproduce the paper, readers can download the repository and run `renv::restore()` in their console to reproduce the environment.
+
 ### Supplementary Material
 
 We include an annotated R Markdown file as a complement to the manuscript. For didactic purpose, please use this instead. [Click here to download](https://github.com/rameliaz/grm-tutorial-paper/blob/main/annotated_codes.Rmd).
