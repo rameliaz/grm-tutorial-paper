@@ -34,6 +34,7 @@ grm-tutorial-paper/
 ├── _extensions/             # Vendored apaquarto Quarto template (required by manuscript.qmd)
 ├── code/
 │   └── annotated_codes.Rmd # Annotated, didactic walkthrough of the GRM analysis (supplementary material)
+│   └── annotated_codes.qmd # Annotated, didactic walkthrough of the GRM analysis in a Quarto document (supplementary material)
 ├── data/
 │   ├── data.csv            # Right-Wing Authoritarianism (RWA) dataset used in the tutorial
 │   └── codebook.txt         # Codebook describing all variables in data.csv
