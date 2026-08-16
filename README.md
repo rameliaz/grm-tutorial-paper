@@ -12,9 +12,41 @@ Manuscript is fully reproducible, written in [APA template for Quarto](https://g
 
 We complement the repository with `renv()` so to fully reproduce the paper, readers can download the repository and run `renv::restore()` in their console to reproduce the environment.
 
+### Requirements
+
+- **R 4.6.1** (the version pinned in `renv.lock`). Using a different R version, especially an older one, may cause `renv::restore()` to fail on packages that need to compile from source, since prebuilt binaries are generally only available for the R version a package was built against.
+- [Quarto](https://quarto.org/) to render `manuscript.qmd`.
+
 ### Supplementary Material
 
-We include an annotated R Markdown file as a complement to the manuscript. For didactic purpose, please use this instead. [Click here to download](https://github.com/rameliaz/grm-tutorial-paper/blob/main/annotated_codes.Rmd).
+We include an annotated R Markdown file as a complement to the manuscript. For didactic purpose, please use this instead. [Click here to download](https://github.com/rameliaz/grm-tutorial-paper/blob/main/code/annotated_codes.Rmd).
+
+### Folder Structure
+
+```
+grm-tutorial-paper/
+├── manuscript.qmd          # Manuscript source (Quarto, apaquarto-docx format)
+├── manuscript.docx         # Rendered manuscript
+├── references.bib          # Bibliography
+├── grm-tutorial-paper.Rproj
+├── renv.lock, renv/        # Locked package environment (renv::restore() to reproduce)
+├── .Rprofile                
+├── _extensions/             # Vendored apaquarto Quarto template (required by manuscript.qmd)
+├── code/
+│   └── annotated_codes.Rmd # Annotated, didactic walkthrough of the GRM analysis (supplementary material)
+├── data/
+│   ├── data.csv            # Right-Wing Authoritarianism (RWA) dataset used in the tutorial
+│   └── codebook.txt         # Codebook describing all variables in data.csv
+├── figures/                 # Standalone figures/diagrams referenced by the manuscript
+│   ├── flowchart.png
+│   ├── CPF example.png
+│   ├── figures.drawio       # Editable source file for the diagrams above
+│   ├── orcid.png
+│   └── lifecycle-experimental.svg
+└── submission_archive/      # Private, git-ignored: drafts, cover letters, reviewer
+                              # correspondence, and other journal-submission records.
+                              # Not needed to reproduce the paper.
+```
 
 ### Citation
 

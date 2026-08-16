@@ -119,7 +119,7 @@ To illustrate the step function, consider a scale measuring sadistic personality
 #| output: true
 #| echo: false
 
-knitr::include_graphics("CPF example.png")
+knitr::include_graphics("figures/CPF example.png")
 ```
 
 {{< pagebreak >}}
@@ -601,7 +601,7 @@ We have described the process of conducting a GRM analysis, starting with testin
 #| output: true
 #| echo: false
 
-knitr::include_graphics("flowchart.png")
+knitr::include_graphics("figures/flowchart.png")
 ```
 
 {{< pagebreak >}}
